@@ -6,18 +6,20 @@ import { prisma } from "@/lib/prisma";
  * explícito y positivo — nunca traigas la fila completa y ocultes campos en
  * el render.
  *
- * Campos deliberadamente ausentes: email de login (se expone tal cual en
- * "correo de contacto" porque el propio alumno decidió publicarlo, pero el
- * resto — passwordHash, emailVerificado, estadoPublicacion — no.
+ * Campos deliberadamente ausentes: `email` (correo de acceso a la cuenta —
+ * nunca se muestra en público; el botón de contacto usa `correoContacto`,
+ * que el alumno decide si completa o no), `passwordHash`, `emailVerificado`,
+ * `estadoPublicacion`.
  */
 export const SELECT_PUBLICO = {
   id: true,
   nombreCompleto: true,
   fotoUrl: true,
   tituloProfesional: true,
+  especializacion: true,
   numeroRegistroProfesional: true,
-  email: true,
   whatsapp: true,
+  correoContacto: true,
   direccionConsultorio: true,
   horariosAtencion: true,
   bio: true,

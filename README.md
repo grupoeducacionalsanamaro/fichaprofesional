@@ -76,10 +76,12 @@ enlaces de un solo uso de verificación de correo y recuperación de contraseña
 ### Regla de visibilidad
 
 `src/lib/datos-publicos.ts` es la única vía por la que la parte pública consulta la base, con un
-`select` explícito y positivo. Solo se expone lo que la propia persona escribió para publicar: no
-hay campos "privados" adicionales más allá de `passwordHash` y `emailVerificado`. Su única función,
-`obtenerFichaPublica(id)`, lee una ficha por su id exacto — no existe un listado ni una búsqueda
-sobre la tabla `Alumno` desde la capa pública.
+`select` explícito y positivo. Solo se expone lo que la propia persona escribió para publicar. El
+campo `email` (el correo de acceso a la cuenta) **nunca** está en ese `select`: el botón de
+contacto de la ficha pública usa `correoContacto`, un campo aparte y opcional que el alumno decide
+si completa. Los demás campos ausentes son los internos de la cuenta — `passwordHash` y
+`emailVerificado`. Su única función, `obtenerFichaPublica(id)`, lee una ficha por su id exacto — no
+existe un listado ni una búsqueda sobre la tabla `Alumno` desde la capa pública.
 
 ## Rutas
 

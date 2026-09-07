@@ -15,14 +15,16 @@ datasource db {
 model Alumno {
   id            String  @id @default(cuid()) // id_ficha — usado en la URL pública
   nombreCompleto String
-  email         String  @unique // login y botón de contacto público
+  email         String  @unique // solo para iniciar sesión — nunca se muestra en la ficha pública
   emailVerificado Boolean @default(false)
   passwordHash  String
 
   tituloProfesional         String  @default("")
+  especializacion           String?
   numeroRegistroProfesional String?
   fotoUrl                   String?
   whatsapp                  String?
+  correoContacto            String? // botón "Correo electrónico" de la ficha pública, distinto del correo de acceso
   direccionConsultorio      String?
   horariosAtencion          String?
   bio                       String?

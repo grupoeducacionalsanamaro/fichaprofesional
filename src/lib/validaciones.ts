@@ -12,6 +12,19 @@ const textoOpcional = (max: number) =>
     .transform((v) => (v === "" ? null : v))
     .nullable();
 
+/** Igual que `textoOpcional`, pero valida formato de correo cuando no está vacío. */
+const correoOpcional = (max: number) =>
+  z
+    .string()
+    .trim()
+    .toLowerCase()
+    .max(max)
+    .transform((v) => (v === "" ? null : v))
+    .nullable()
+    .refine((v) => v === null || z.email().safeParse(v).success, {
+      message: "Correo de contacto inválido.",
+    });
+
 const CONTRASENA_MINIMA = 8;
 
 export const esquemaRegistro = z
@@ -75,8 +88,10 @@ export const esquemaRedSocial = z.object({
 export const esquemaFicha = z.object({
   nombreCompleto: z.string().trim().min(3, "Ingresa tu nombre completo.").max(160),
   tituloProfesional: z.string().trim().min(2, "Indica tu título profesional.").max(120),
+  especializacion: textoOpcional(120),
   numeroRegistroProfesional: textoOpcional(60),
   whatsapp: textoOpcional(40),
+  correoContacto: correoOpcional(160),
   direccionConsultorio: textoOpcional(200),
   horariosAtencion: textoOpcional(200),
   bio: textoOpcional(600),

@@ -11,6 +11,8 @@ import type { Prisma } from "@/generated/prisma/client";
 export type EstadoFicha = {
   error?: string;
   guardado?: boolean;
+  /** true cuando este envío incluyó una foto nueva y quedó subida. */
+  fotoActualizada?: boolean;
   /** Valores reenviados al formulario: React 19 resetea los campos tras cada acción. */
   valores?: Record<string, string>;
 };
@@ -18,8 +20,10 @@ export type EstadoFicha = {
 const CAMPOS_TEXTO = [
   "nombreCompleto",
   "tituloProfesional",
+  "especializacion",
   "numeroRegistroProfesional",
   "whatsapp",
+  "correoContacto",
   "direccionConsultorio",
   "horariosAtencion",
   "bio",
@@ -49,8 +53,10 @@ export async function guardarFicha(_previo: EstadoFicha, formData: FormData): Pr
   const analisis = esquemaFicha.safeParse({
     nombreCompleto: formData.get("nombreCompleto") ?? "",
     tituloProfesional: formData.get("tituloProfesional") ?? "",
+    especializacion: formData.get("especializacion") ?? "",
     numeroRegistroProfesional: formData.get("numeroRegistroProfesional") ?? "",
     whatsapp: formData.get("whatsapp") ?? "",
+    correoContacto: formData.get("correoContacto") ?? "",
     direccionConsultorio: formData.get("direccionConsultorio") ?? "",
     horariosAtencion: formData.get("horariosAtencion") ?? "",
     bio: formData.get("bio") ?? "",
@@ -63,6 +69,7 @@ export async function guardarFicha(_previo: EstadoFicha, formData: FormData): Pr
   const datos = analisis.data;
 
   const foto = formData.get("foto");
+  let fotoActualizada = false;
   if (foto instanceof File && foto.size > 0) {
     if (!TIPOS_FOTO.includes(foto.type)) {
       return { error: "La foto debe ser JPG, PNG o WEBP.", valores };
@@ -80,6 +87,7 @@ export async function guardarFicha(_previo: EstadoFicha, formData: FormData): Pr
       contentType: foto.type,
     });
     datos.fotoUrl = subida.url;
+    fotoActualizada = true;
   }
 
   await prisma.alumno.update({
@@ -87,8 +95,10 @@ export async function guardarFicha(_previo: EstadoFicha, formData: FormData): Pr
     data: {
       nombreCompleto: datos.nombreCompleto,
       tituloProfesional: datos.tituloProfesional,
+      especializacion: datos.especializacion,
       numeroRegistroProfesional: datos.numeroRegistroProfesional,
       whatsapp: datos.whatsapp,
+      correoContacto: datos.correoContacto,
       direccionConsultorio: datos.direccionConsultorio,
       horariosAtencion: datos.horariosAtencion,
       bio: datos.bio,
@@ -100,7 +110,7 @@ export async function guardarFicha(_previo: EstadoFicha, formData: FormData): Pr
   revalidatePath("/panel");
   revalidatePath(`/ficha/${alumnoId}`);
   revalidatePath("/");
-  return { guardado: true };
+  return { guardado: true, fotoActualizada };
 }
 
 export async function alternarPublicacion() {

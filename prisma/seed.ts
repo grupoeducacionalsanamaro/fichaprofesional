@@ -48,6 +48,7 @@ async function main() {
       tituloProfesional: "Psicóloga clínica (DEMO)",
       numeroRegistroProfesional: "12345-6",
       whatsapp: "+56 9 1111 1111",
+      correoContacto: "contacto.demo@demo.sanamaro.cl",
       direccionConsultorio: "Av. Providencia 1234, of. 56, Providencia",
       horariosAtencion: "Lunes a viernes, 9:00 a 18:00",
       bio: "Ficha de demostración con datos ficticios, creada para revisar el diseño del directorio.",

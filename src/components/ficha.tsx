@@ -35,12 +35,14 @@ export function AccionesContacto({ ficha }: { ficha: FichaPublica }) {
       icono: MessageCircle,
       texto: "WhatsApp",
     },
-    {
-      href: `mailto:${ficha.email}`,
+    ficha.correoContacto && {
+      href: `mailto:${ficha.correoContacto}`,
       icono: Mail,
       texto: "Correo",
     },
   ].filter(Boolean) as { href: string; icono: typeof Mail; texto: string }[];
+
+  if (acciones.length === 0) return null;
 
   return (
     <div className={cn("grid gap-2", acciones.length === 2 ? "grid-cols-2" : "grid-cols-1")}>
@@ -102,27 +104,28 @@ export function TarjetaFicha({ ficha }: { ficha: FichaPublica }) {
       <Encabezado ficha={ficha} />
 
       <div className="p-5">
-        <div className="grid gap-2">
-          <AccionesContacto ficha={ficha} />
-        </div>
+        <AccionesContacto ficha={ficha} />
 
         {ficha.bio && (
           <p className="mt-5 text-[15px] leading-relaxed text-tinta-700">{ficha.bio}</p>
         )}
 
         <dl className="mt-5">
+          <Dato rotulo="Especialización" valor={ficha.especializacion} />
           <Dato rotulo="N° registro" valor={ficha.numeroRegistroProfesional} />
           <Dato rotulo="Consultorio" valor={ficha.direccionConsultorio} />
           <Dato rotulo="Horarios" valor={ficha.horariosAtencion} />
           <Dato
-            rotulo="Correo"
+            rotulo="Correo electrónico"
             valor={
-              <a
-                className="break-all text-petroleo-500 underline decoration-laton-300 decoration-2 underline-offset-4 transition-colors hover:text-petroleo-700"
-                href={`mailto:${ficha.email}`}
-              >
-                {ficha.email}
-              </a>
+              ficha.correoContacto && (
+                <a
+                  className="break-all text-petroleo-500 underline decoration-laton-300 decoration-2 underline-offset-4 transition-colors hover:text-petroleo-700"
+                  href={`mailto:${ficha.correoContacto}`}
+                >
+                  {ficha.correoContacto}
+                </a>
+              )
             }
           />
         </dl>

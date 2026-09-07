@@ -1,7 +1,7 @@
 "use client";
 
-import { useActionState, useState } from "react";
-import { Plus, X } from "lucide-react";
+import { useActionState, useEffect, useState } from "react";
+import { CheckCircle2, Plus, X } from "lucide-react";
 import { AreaTexto, Aviso, Boton, Campo, Entrada, Rotulo } from "@/components/ui";
 import { Avatar } from "@/components/avatar";
 import { guardarFicha, type EstadoFicha } from "./acciones-ficha";
@@ -12,9 +12,11 @@ type DatosAlumno = {
   nombreCompleto: string;
   email: string;
   tituloProfesional: string;
+  especializacion: string | null;
   numeroRegistroProfesional: string | null;
   fotoUrl: string | null;
   whatsapp: string | null;
+  correoContacto: string | null;
   direccionConsultorio: string | null;
   horariosAtencion: string | null;
   bio: string | null;
@@ -42,14 +44,40 @@ function Bloque({ titulo, children }: { titulo: string; children: React.ReactNod
 export function FormularioFicha({ alumno }: { alumno: DatosAlumno }) {
   const [estado, accion, enviando] = useActionState<EstadoFicha, FormData>(guardarFicha, {});
   const [redes, setRedes] = useState<RedSocial[]>(() => redesIniciales(alumno.redesSociales));
+  const [fotoElegida, setFotoElegida] = useState<{ nombre: string; previewUrl: string } | null>(null);
+  const [ultimoGuardado, setUltimoGuardado] = useState(estado.guardado);
 
   const valor = (campo: string, original: string | null) => estado.valores?.[campo] ?? original ?? "";
+
+  // Limpia el object URL de la vista previa al elegir otra foto o al salir del formulario.
+  useEffect(() => {
+    return () => {
+      if (fotoElegida) URL.revokeObjectURL(fotoElegida.previewUrl);
+    };
+  }, [fotoElegida]);
+
+  // Tras guardar con éxito, la foto ya quedó subida al servidor: la vista
+  // previa local deja de ser necesaria (el avatar del encabezado se actualiza
+  // con la URL real que llega en `alumno`). Ajuste durante el render, no en
+  // un efecto: reacciona a un cambio de `estado`, no sincroniza con algo externo.
+  if (estado.guardado !== ultimoGuardado) {
+    setUltimoGuardado(estado.guardado);
+    if (estado.guardado) setFotoElegida(null);
+  }
+
+  function alElegirFoto(archivo: File | undefined) {
+    setFotoElegida(archivo ? { nombre: archivo.name, previewUrl: URL.createObjectURL(archivo) } : null);
+  }
 
   return (
     <form action={accion} className="space-y-3">
       <section className="overflow-hidden rounded-tarjeta bg-superficie shadow-tarjeta ring-1 ring-tinta-200/70">
         <div className="flex items-center gap-4 border-b-2 border-laton-500 bg-petroleo-700 p-5">
-          <Avatar nombre={alumno.nombreCompleto} fotoUrl={alumno.fotoUrl} tamano={64} />
+          <Avatar
+            nombre={alumno.nombreCompleto}
+            fotoUrl={fotoElegida?.previewUrl ?? alumno.fotoUrl}
+            tamano={64}
+          />
           <div className="min-w-0">
             <p className="truncate text-lg font-bold tracking-tight text-white">{alumno.nombreCompleto}</p>
             <p className="truncate text-[13px] text-laton-200">{alumno.email}</p>
@@ -61,9 +89,16 @@ export function FormularioFicha({ alumno }: { alumno: DatosAlumno }) {
               type="file"
               name="foto"
               accept="image/jpeg,image/png,image/webp"
+              onChange={(e) => alElegirFoto(e.target.files?.[0])}
               className="w-full cursor-pointer text-sm text-tinta-600 file:mr-3 file:min-h-11 file:cursor-pointer file:rounded-control file:border-0 file:bg-petroleo-50 file:px-4 file:text-sm file:font-semibold file:text-petroleo-700 file:transition-colors hover:file:bg-petroleo-100"
             />
           </Campo>
+          {fotoElegida && (
+            <p className="mt-2.5 flex items-center gap-1.5 text-sm font-medium text-exito-700">
+              <CheckCircle2 aria-hidden size={16} />
+              «{fotoElegida.nombre}» seleccionada — se sube al guardar cambios.
+            </p>
+          )}
         </div>
       </section>
 
@@ -73,6 +108,13 @@ export function FormularioFicha({ alumno }: { alumno: DatosAlumno }) {
         </Campo>
         <Campo etiqueta="Título profesional" requerido>
           <Entrada name="tituloProfesional" defaultValue={valor("tituloProfesional", alumno.tituloProfesional)} required maxLength={120} />
+        </Campo>
+        <Campo etiqueta="Especialización" ayuda="Si tienes una especialización, indica cuál es.">
+          <Entrada
+            name="especializacion"
+            defaultValue={valor("especializacion", alumno.especializacion)}
+            maxLength={120}
+          />
         </Campo>
         <Campo etiqueta="N° de registro profesional / colegiado" ayuda="Opcional.">
           <Entrada
@@ -86,6 +128,17 @@ export function FormularioFicha({ alumno }: { alumno: DatosAlumno }) {
       <Bloque titulo="Cómo te contactan">
         <Campo etiqueta="WhatsApp Business" ayuda="Se mostrará como botón de contacto directo.">
           <Entrada name="whatsapp" defaultValue={valor("whatsapp", alumno.whatsapp)} maxLength={40} />
+        </Campo>
+        <Campo
+          etiqueta="Correo electrónico institucional"
+          ayuda="El correo al que el público podrá escribirte. En tu ficha pública se verá como «Correo electrónico»; es distinto del correo con el que iniciaste sesión, que nunca se muestra."
+        >
+          <Entrada
+            name="correoContacto"
+            type="email"
+            defaultValue={valor("correoContacto", alumno.correoContacto)}
+            maxLength={160}
+          />
         </Campo>
         <Campo etiqueta="Dirección del consultorio">
           <Entrada
@@ -157,7 +210,11 @@ export function FormularioFicha({ alumno }: { alumno: DatosAlumno }) {
       </Bloque>
 
       {estado.error && <Aviso tono="error">{estado.error}</Aviso>}
-      {estado.guardado && <Aviso tono="exito">Ficha guardada.</Aviso>}
+      {estado.guardado && (
+        <Aviso tono="exito">
+          {estado.fotoActualizada ? "Ficha guardada. Tu foto se subió con éxito." : "Ficha guardada."}
+        </Aviso>
+      )}
 
       <Boton type="submit" cargando={enviando} tamano="grande" className="w-full">
         {enviando ? "Guardando…" : "Guardar cambios"}
