@@ -27,30 +27,14 @@ export const SELECT_PUBLICO = {
 export type RedSocial = { plataforma: string; url: string };
 export type FichaPublica = NonNullable<Awaited<ReturnType<typeof obtenerFichaPublica>>>;
 
+/**
+ * Única forma de leer una ficha pública: por su id exacto. No existe un
+ * listado ni una búsqueda — cada ficha se comparte por enlace directo, no se
+ * navega desde un directorio público.
+ */
 export async function obtenerFichaPublica(id: string) {
   return prisma.alumno.findFirst({
     where: { id, estadoPublicacion: "PUBLICADA" },
     select: SELECT_PUBLICO,
-  });
-}
-
-export type FiltrosDirectorio = { q?: string };
-
-export async function listarDirectorio(filtros: FiltrosDirectorio) {
-  return prisma.alumno.findMany({
-    where: {
-      estadoPublicacion: "PUBLICADA",
-      ...(filtros.q
-        ? {
-            OR: [
-              { nombreCompleto: { contains: filtros.q, mode: "insensitive" as const } },
-              { tituloProfesional: { contains: filtros.q, mode: "insensitive" as const } },
-            ],
-          }
-        : {}),
-    },
-    select: SELECT_PUBLICO,
-    orderBy: [{ nombreCompleto: "asc" }],
-    take: 300,
   });
 }

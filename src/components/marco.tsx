@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { cn } from "@/lib/utils";
 
-export function Cabecera({ enlaceVolver, accionesAuth }: { enlaceVolver?: boolean; accionesAuth?: boolean }) {
+export function Cabecera({ enlaceVolver }: { enlaceVolver?: boolean }) {
   return (
     <header className="sticky top-0 z-40 border-b border-tinta-200/70 bg-superficie/85 backdrop-blur-md">
       <div className="mx-auto flex max-w-3xl items-center justify-between gap-3 px-4 py-3">
@@ -25,15 +25,7 @@ export function Cabecera({ enlaceVolver, accionesAuth }: { enlaceVolver?: boolea
               href="/"
               className="rounded-lg px-2 py-1 text-sm font-semibold text-petroleo-500 transition-colors hover:bg-petroleo-50 hover:text-petroleo-700"
             >
-              Ver directorio
-            </Link>
-          )}
-          {accionesAuth && (
-            <Link
-              href="/panel"
-              className="rounded-lg px-2 py-1 text-sm font-semibold text-petroleo-500 transition-colors hover:bg-petroleo-50 hover:text-petroleo-700"
-            >
-              Mi panel
+              Inicio
             </Link>
           )}
         </div>

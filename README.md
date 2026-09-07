@@ -1,9 +1,12 @@
 # Directorio de Alumnos — Grupo Educacional San Amaro
 
-Directorio profesional público de alumnos y egresados del holding: cada persona crea su propia
-cuenta, edita su ficha y decide cuándo publicarla. A diferencia de
+Ficha profesional de contacto para alumnos y egresados del holding: cada persona crea su propia
+cuenta, edita su ficha y decide cuándo publicarla, y la comparte con un enlace directo
+(`/ficha/[id]`). **No hay un listado ni un buscador público** — no existe una página que muestre
+"todas las fichas": cada una vive sola, para compartirse de a una, igual que una tarjeta de
+presentación. A diferencia de
 [`APP LLAVEROS SAN AMARO`](../APP%20LLAVEROS%20SAN%20AMARO) (directorio de colaboradores, gestionado
-por RR.HH.), aquí **no hay panel de administración ni datos de institución**: es una ficha de
+por RR.HH.), aquí tampoco hay panel de administración ni datos de institución: es una ficha de
 contacto profesional (nombre, título, foto, contacto, consultorio, redes) autogestionada de punta
 a punta por su titular.
 
@@ -74,14 +77,16 @@ enlaces de un solo uso de verificación de correo y recuperación de contraseña
 
 `src/lib/datos-publicos.ts` es la única vía por la que la parte pública consulta la base, con un
 `select` explícito y positivo. Solo se expone lo que la propia persona escribió para publicar: no
-hay campos "privados" adicionales más allá de `passwordHash` y `emailVerificado`.
+hay campos "privados" adicionales más allá de `passwordHash` y `emailVerificado`. Su única función,
+`obtenerFichaPublica(id)`, lee una ficha por su id exacto — no existe un listado ni una búsqueda
+sobre la tabla `Alumno` desde la capa pública.
 
 ## Rutas
 
 | Ruta | Acceso | Qué es |
 |---|---|---|
-| `/` | Público | Directorio: búsqueda por nombre o título profesional. |
-| `/ficha/[id]` | Público | Ficha individual. 404 si no existe **o** no está publicada. |
+| `/` | Público | Landing: explica la app y lleva a crear cuenta / iniciar sesión (o a "Mi panel" si ya hay sesión). |
+| `/ficha/[id]` | Público | Ficha individual, accesible solo por enlace directo. 404 si no existe **o** no está publicada. |
 | `/registro` | Público | Crear cuenta (nombre, correo, contraseña). Inicia sesión automáticamente. |
 | `/login` | Público | Inicio de sesión. |
 | `/recuperar`, `/recuperar/[token]` | Público | Recuperación de contraseña por correo. |
@@ -98,9 +103,9 @@ Completa su ficha en /panel (foto, título, contacto, redes sociales)
       ↓
 Confirma su correo (enlace de un solo uso, 3 días)
       ↓
-Publica su propia ficha desde /panel → visible en el directorio y en /ficha/[id]
+Publica su propia ficha desde /panel → visible en /ficha/[id], su enlace estable
       ↓
-Puede retirarla del directorio o editarla en cualquier momento — sin revisión de terceros
+Puede retirarla o editarla en cualquier momento — sin revisión de terceros
 ```
 
 No existe un rol de administrador: cada persona es la única que puede editar, publicar, retirar
@@ -131,13 +136,17 @@ RR.HH. gestionando trabajadores no aplican a un directorio autogestionado:
    auditar frente al titular.
 2. **Sin datos de institución.** No hay `MarcaInstituto`, `área`, `sede` ni `cargo`: la ficha es
    un perfil profesional independiente del holding, no un registro de dotación.
-3. **Campos nuevos para un perfil profesional**: título profesional, número de registro/colegiado,
+3. **Sin listado ni búsqueda pública.** El original tenía un directorio navegable con filtros; acá
+   no existe esa vista ni la consulta que la respalda (`listarDirectorio` fue eliminada de
+   `src/lib/datos-publicos.ts`). Cada ficha se comparte por su propio enlace, no se descubre
+   navegando. La home (`/`) es una landing que lleva a crear cuenta o iniciar sesión.
+4. **Campos nuevos para un perfil profesional**: título profesional, número de registro/colegiado,
    dirección de consultorio, horarios de atención y enlaces a redes sociales (plataforma + URL
    libres, sin lista fija).
-4. **Verificación de correo y recuperación de contraseña**, ausentes en el original porque las
+5. **Verificación de correo y recuperación de contraseña**, ausentes en el original porque las
    cuentas de RR.HH. se gestionaban a mano vía variable de entorno. Aquí son parte central del
    autoservicio.
-5. **Rate limit e infraestructura (Blob, Resend, sesión firmada) reutilizados sin cambios** desde
+6. **Rate limit e infraestructura (Blob, Resend, sesión firmada) reutilizados sin cambios** desde
    el proyecto de colaboradores — ver los mismos archivos en `src/lib/`.
 
 ## Pasos manuales pendientes

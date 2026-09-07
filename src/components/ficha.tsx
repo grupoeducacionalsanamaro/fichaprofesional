@@ -1,4 +1,3 @@
-import Link from "next/link";
 import { ExternalLink, Mail, MessageCircle } from "lucide-react";
 import { Avatar } from "@/components/avatar";
 import { Rotulo } from "@/components/ui";
@@ -14,27 +13,15 @@ function redesSociales(valor: FichaPublica["redesSociales"]): RedSocial[] {
 }
 
 /** Cabecera de la ficha: foto, nombre y título profesional sobre fondo petróleo. */
-function Encabezado({ ficha, compacto }: { ficha: FichaPublica; compacto?: boolean }) {
+function Encabezado({ ficha }: { ficha: FichaPublica }) {
   return (
-    <div
-      className={cn(
-        "flex items-center gap-4 border-b-2 border-laton-500 bg-petroleo-700",
-        compacto ? "p-4" : "p-5",
-      )}
-    >
-      <Avatar nombre={ficha.nombreCompleto} fotoUrl={ficha.fotoUrl} tamano={compacto ? 56 : 80} />
+    <div className="flex items-center gap-4 border-b-2 border-laton-500 bg-petroleo-700 p-5">
+      <Avatar nombre={ficha.nombreCompleto} fotoUrl={ficha.fotoUrl} tamano={80} />
       <div className="min-w-0">
-        <h2
-          className={cn(
-            "truncate font-bold leading-tight tracking-tight text-white",
-            compacto ? "text-base" : "text-[1.4rem]",
-          )}
-        >
+        <h2 className="truncate text-[1.4rem] font-bold leading-tight tracking-tight text-white">
           {ficha.nombreCompleto}
         </h2>
-        <p className={cn("truncate text-laton-200", compacto ? "text-sm" : "mt-0.5 text-[15px]")}>
-          {ficha.tituloProfesional}
-        </p>
+        <p className="mt-0.5 truncate text-[15px] text-laton-200">{ficha.tituloProfesional}</p>
       </div>
     </div>
   );
@@ -152,20 +139,5 @@ export function TarjetaFicha({ ficha }: { ficha: FichaPublica }) {
         <Rotulo className="text-tinta-300">{ficha.id.slice(-6).toUpperCase()}</Rotulo>
       </p>
     </article>
-  );
-}
-
-/** Misma ficha, en versión compacta para la grilla del directorio. */
-export function TarjetaDirectorio({ ficha }: { ficha: FichaPublica }) {
-  return (
-    <Link
-      href={`/ficha/${ficha.id}`}
-      className="movimiento-hover group/tarjeta block overflow-hidden rounded-tarjeta bg-superficie shadow-tarjeta ring-1 ring-tinta-200/70 transition-[transform,box-shadow] duration-200 hover:-translate-y-1 hover:shadow-elevada"
-    >
-      <Encabezado ficha={ficha} compacto />
-      {ficha.direccionConsultorio && (
-        <p className="truncate px-4 py-3 text-sm text-tinta-600">{ficha.direccionConsultorio}</p>
-      )}
-    </Link>
   );
 }
