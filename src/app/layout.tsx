@@ -24,6 +24,9 @@ export const metadata: Metadata = {
   },
   description:
     "Directorio de profesionales y egresados del Grupo Educacional San Amaro: ficha de contacto pública para que cada uno se dé a conocer.",
+  openGraph: {
+    images: ["/logo.png"],
+  },
 };
 
 export default function RootLayout({ children }: LayoutProps<"/">) {

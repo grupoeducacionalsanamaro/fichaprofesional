@@ -1,3 +1,4 @@
+import Image from "next/image";
 import Link from "next/link";
 import { requerirProfesional } from "@/lib/auth";
 import { NavegacionPanel } from "./navegacion";
@@ -15,7 +16,7 @@ export default async function LayoutPanel({ children }: LayoutProps<"/panel">) {
       <header className="sticky top-0 z-40 border-b border-tinta-200/70 bg-superficie/85 backdrop-blur-md">
         <div className="mx-auto flex max-w-3xl flex-wrap items-center justify-between gap-2 px-4 pt-3">
           <Link href="/panel" className="flex min-w-0 items-center gap-3">
-            <span aria-hidden className="h-8 w-1.5 shrink-0 rounded-full bg-laton-500" />
+            <Image src="/logo.png" alt="" aria-hidden width={36} height={36} className="h-9 w-9 shrink-0" />
             <span className="min-w-0">
               <span className="block font-rotulo text-[10px] font-semibold uppercase tracking-[0.18em] text-tinta-500">
                 Mi cuenta

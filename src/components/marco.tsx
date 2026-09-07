@@ -1,3 +1,4 @@
+import Image from "next/image";
 import Link from "next/link";
 import { cn } from "@/lib/utils";
 
@@ -6,9 +7,14 @@ export function Cabecera({ enlaceVolver }: { enlaceVolver?: boolean }) {
     <header className="sticky top-0 z-40 border-b border-tinta-200/70 bg-superficie/85 backdrop-blur-md">
       <div className="mx-auto flex max-w-3xl items-center justify-between gap-3 px-4 py-3">
         <Link href="/" className="group/marca flex min-w-0 items-center gap-3">
-          <span
+          <Image
+            src="/logo.png"
+            alt=""
             aria-hidden
-            className="h-9 w-1.5 shrink-0 rounded-full bg-laton-500 transition-all duration-200 group-hover/marca:h-10"
+            width={40}
+            height={40}
+            priority
+            className="h-10 w-10 shrink-0 transition-transform duration-200 group-hover/marca:scale-105"
           />
           <span className="min-w-0">
             <span className="block truncate font-rotulo text-[10px] font-semibold uppercase tracking-[0.18em] text-tinta-500">
@@ -50,11 +56,15 @@ export function PieDePagina() {
   return (
     <footer className="mx-auto w-full max-w-3xl px-4 pb-10 pt-4">
       <p className="border-t border-tinta-200 pt-4 text-xs leading-relaxed text-tinta-500">
-        Cada ficha es publicada y editada por su propio titular.{" "}
-        <Link href="/registro" className="font-semibold text-petroleo-500 underline">
-          Crea la tuya
-        </Link>{" "}
-        o escribe a Grupo San Amaro si algo no corresponde.
+        Cada ficha es publicada y editada por su propio titular. Creado por{" "}
+        <a
+          href="https://sanamaro.cl"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="font-semibold text-petroleo-500 underline"
+        >
+          Grupo Educacional San Amaro
+        </a>
       </p>
     </footer>
   );

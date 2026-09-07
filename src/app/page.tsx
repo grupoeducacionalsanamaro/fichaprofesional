@@ -1,3 +1,4 @@
+import Image from "next/image";
 import Link from "next/link";
 import { Boton } from "@/components/ui";
 import { Cabecera, Contenido, PieDePagina } from "@/components/marco";
@@ -16,7 +17,15 @@ export default async function Inicio() {
       <Cabecera />
       <Contenido className="max-w-lg">
         <div className="rounded-tarjeta bg-superficie p-6 text-center shadow-tarjeta ring-1 ring-tinta-200/70">
-          <h1 className="text-[1.5rem] font-bold tracking-tight text-tinta-900">
+          <Image
+            src="/logo.png"
+            alt="Directorio de Profesionales — Grupo San Amaro"
+            width={80}
+            height={80}
+            priority
+            className="mx-auto h-20 w-20"
+          />
+          <h1 className="mt-4 text-[1.5rem] font-bold tracking-tight text-tinta-900">
             Tu ficha profesional, lista para compartir
           </h1>
           <p className="mt-2 text-[15px] leading-relaxed text-tinta-600">
