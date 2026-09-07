@@ -8,7 +8,7 @@ import { prisma } from "@/lib/prisma";
  *
  * Campos deliberadamente ausentes: `email` (correo de acceso a la cuenta —
  * nunca se muestra en público; el botón de contacto usa `correoContacto`,
- * que el alumno decide si completa o no), `passwordHash`, `emailVerificado`,
+ * que el profesional decide si completa o no), `passwordHash`, `emailVerificado`,
  * `estadoPublicacion`.
  */
 export const SELECT_PUBLICO = {
@@ -24,6 +24,7 @@ export const SELECT_PUBLICO = {
   horariosAtencion: true,
   bio: true,
   redesSociales: true,
+  temaFicha: true,
 } as const;
 
 export type RedSocial = { plataforma: string; url: string };
@@ -35,7 +36,7 @@ export type FichaPublica = NonNullable<Awaited<ReturnType<typeof obtenerFichaPub
  * navega desde un directorio público.
  */
 export async function obtenerFichaPublica(id: string) {
-  return prisma.alumno.findFirst({
+  return prisma.profesional.findFirst({
     where: { id, estadoPublicacion: "PUBLICADA" },
     select: SELECT_PUBLICO,
   });

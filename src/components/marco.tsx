@@ -15,7 +15,7 @@ export function Cabecera({ enlaceVolver }: { enlaceVolver?: boolean }) {
               Grupo Educacional San Amaro
             </span>
             <span className="block truncate text-[15px] font-bold tracking-tight text-tinta-900">
-              Directorio de Alumnos
+              Directorio de Profesionales
             </span>
           </span>
         </Link>

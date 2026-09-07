@@ -30,7 +30,7 @@ export default async function VerificarCorreo({ params }: PageProps<"/verificar/
     );
   }
 
-  await prisma.alumno.update({ where: { id: fila.alumnoId }, data: { emailVerificado: true } });
+  await prisma.profesional.update({ where: { id: fila.profesionalId }, data: { emailVerificado: true } });
   await marcarTokenUsado(fila.id);
 
   return (

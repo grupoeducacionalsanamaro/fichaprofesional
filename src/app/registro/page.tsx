@@ -13,7 +13,7 @@ export default async function Registro() {
     <>
       <Cabecera />
       <Contenido className="max-w-md">
-        <h1 className="text-[1.65rem] font-bold tracking-tight">Crea tu ficha de alumno</h1>
+        <h1 className="text-[1.65rem] font-bold tracking-tight">Crea tu ficha profesional</h1>
         <p className="mt-1 mb-5 text-sm text-tinta-500">
           Tu cuenta es tuya: solo tú puedes editar y publicar tu ficha profesional.
         </p>

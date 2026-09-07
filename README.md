@@ -1,6 +1,6 @@
-# Directorio de Alumnos — Grupo Educacional San Amaro
+# Directorio de Profesionales — Grupo Educacional San Amaro
 
-Ficha profesional de contacto para alumnos y egresados del holding: cada persona crea su propia
+Ficha de contacto para profesionales y egresados del holding: cada persona crea su propia
 cuenta, edita su ficha y decide cuándo publicarla, y la comparte con un enlace directo
 (`/ficha/[id]`). **No hay un listado ni un buscador público** — no existe una página que muestre
 "todas las fichas": cada una vive sola, para compartirse de a una, igual que una tarjeta de
@@ -25,7 +25,7 @@ y componentes visuales, pero son proyectos independientes: **repositorio y base 
 | ORM | Prisma 7 (`prisma-client` + driver adapter `@prisma/adapter-pg`) |
 | Fotos | Vercel Blob |
 | Email | Resend (verificación de correo y recuperación de contraseña) |
-| Autenticación | Cada alumno se registra con su propio correo y contraseña (scrypt + cookie de sesión firmada). No hay usuarios de administración. |
+| Autenticación | Cada profesional se registra con su propio correo y contraseña (scrypt + cookie de sesión firmada). No hay usuarios de administración. |
 
 ## Puesta en marcha local
 
@@ -69,19 +69,28 @@ enlaces de verificación y recuperación en los correos.
 
 ## Modelo de datos
 
-`prisma/schema.prisma`. Un solo modelo de negocio, `Alumno` (cuenta + ficha en la misma fila,
+`prisma/schema.prisma`. Un solo modelo de negocio, `Profesional` (cuenta + ficha en la misma fila,
 porque el titular de la cuenta es siempre el titular de la ficha), más `TokenAcceso` para los
 enlaces de un solo uso de verificación de correo y recuperación de contraseña.
+
+### Color de la ficha pública
+
+`Profesional.temaFicha` guarda solo un id (`PETROLEO` por defecto, `BURDEOS`, `MARINO`, `BOSQUE` o
+`GRAFITO`); los valores de color reales — dos por tema: uno para la banda y los botones, otro de
+acento para bordes y subrayados — viven en `src/lib/temas-ficha.ts`, no en la base. El profesional elige
+uno desde `/panel` (con vista previa en vivo) y `src/components/ficha.tsx` lo aplica en la ficha
+pública con estilos en línea, no clases de Tailwind: el color no se conoce en tiempo de build,
+cambia por fila.
 
 ### Regla de visibilidad
 
 `src/lib/datos-publicos.ts` es la única vía por la que la parte pública consulta la base, con un
 `select` explícito y positivo. Solo se expone lo que la propia persona escribió para publicar. El
 campo `email` (el correo de acceso a la cuenta) **nunca** está en ese `select`: el botón de
-contacto de la ficha pública usa `correoContacto`, un campo aparte y opcional que el alumno decide
+contacto de la ficha pública usa `correoContacto`, un campo aparte y opcional que el profesional decide
 si completa. Los demás campos ausentes son los internos de la cuenta — `passwordHash` y
 `emailVerificado`. Su única función, `obtenerFichaPublica(id)`, lee una ficha por su id exacto — no
-existe un listado ni una búsqueda sobre la tabla `Alumno` desde la capa pública.
+existe un listado ni una búsqueda sobre la tabla `Profesional` desde la capa pública.
 
 ## Rutas
 
@@ -99,7 +108,7 @@ existe un listado ni una búsqueda sobre la tabla `Alumno` desde la capa públic
 ## Flujo funcional
 
 ```
-Alumno se registra (correo + contraseña) → sesión abierta automáticamente
+Profesional se registra (correo + contraseña) → sesión abierta automáticamente
       ↓
 Completa su ficha en /panel (foto, título, contacto, redes sociales)
       ↓
@@ -132,7 +141,7 @@ permite la indexación en buscadores, salvo las rutas de cuenta (`/panel`, `/log
 Documentadas aquí porque el código parte de esa misma base y varias piezas que tenían sentido para
 RR.HH. gestionando trabajadores no aplican a un directorio autogestionado:
 
-1. **Sin panel de administración ni invitaciones.** El alumno se registra solo; no hay un tercero
+1. **Sin panel de administración ni invitaciones.** El profesional se registra solo; no hay un tercero
    que lo invite, apruebe su ficha ni la edite en su nombre. Por eso tampoco existen
    `RegistroEdicion` ni `RegistroSupresion`: no hay una segunda parte cuyas acciones haya que
    auditar frente al titular.
@@ -163,7 +172,7 @@ RR.HH. gestionando trabajadores no aplican a un directorio autogestionado:
    mediante Routing Rule como hace `/colaboradores`) y fijar `basePath` en `next.config.ts` si
    corresponde.
 6. **Borrar las fichas DEMO** antes de producción:
-   `DELETE FROM "Alumno" WHERE "email" LIKE '%@demo.sanamaro.cl';`
+   `DELETE FROM "Profesional" WHERE "email" LIKE '%@demo.sanamaro.cl';`
 
 ## Fuera de alcance de v1
 

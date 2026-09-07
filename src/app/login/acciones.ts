@@ -35,13 +35,13 @@ export async function entrar(_previo: EstadoAcceso, formData: FormData): Promise
     };
   }
 
-  const alumnoId = await verificarCredenciales(email, contrasena);
-  if (!alumnoId) {
+  const profesionalId = await verificarCredenciales(email, contrasena);
+  if (!profesionalId) {
     // Un solo mensaje para cuenta inexistente y contraseña incorrecta: decir
     // cuál de los dos falló confirmaría qué correos tienen cuenta.
     return { error: "Correo o contraseña incorrectos.", email };
   }
 
-  await iniciarSesion(alumnoId);
+  await iniciarSesion(profesionalId);
   redirect("/panel");
 }

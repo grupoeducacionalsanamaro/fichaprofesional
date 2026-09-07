@@ -12,7 +12,7 @@ export async function generateMetadata({ params }: PageProps<"/ficha/[id]">): Pr
   if (!ficha) return { title: "Ficha no disponible" };
   return {
     title: ficha.nombreCompleto,
-    description: `${ficha.tituloProfesional} — Directorio de Alumnos, Grupo San Amaro`,
+    description: `${ficha.tituloProfesional} — Directorio de Profesionales, Grupo San Amaro`,
   };
 }
 

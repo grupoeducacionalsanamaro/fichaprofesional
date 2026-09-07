@@ -25,15 +25,15 @@ export async function solicitarRecuperacion(
     return { error: "Demasiados intentos. Espera unos minutos e inténtalo de nuevo." };
   }
 
-  const alumno = await prisma.alumno.findUnique({
+  const profesional = await prisma.profesional.findUnique({
     where: { email },
     select: { id: true, nombreCompleto: true },
   });
 
   // Misma respuesta exista o no la cuenta: no delata qué correos están registrados.
-  if (alumno) {
-    const enlace = await crearEnlaceRecuperacion(alumno.id);
-    await enviarRecuperacionContrasena({ para: email, nombre: alumno.nombreCompleto, enlace });
+  if (profesional) {
+    const enlace = await crearEnlaceRecuperacion(profesional.id);
+    await enviarRecuperacionContrasena({ para: email, nombre: profesional.nombreCompleto, enlace });
   }
 
   return { enviado: true };

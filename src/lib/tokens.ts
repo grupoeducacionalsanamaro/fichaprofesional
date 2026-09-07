@@ -1,7 +1,7 @@
 import "server-only";
 import { SignJWT, jwtVerify } from "jose";
 
-const ISSUER = "sanamaro-alumnos";
+const ISSUER = "sanamaro-profesionales";
 
 function secret(nombre: "TOKEN_SECRET" | "SESSION_SECRET") {
   const valor = process.env[nombre];
@@ -12,7 +12,7 @@ function secret(nombre: "TOKEN_SECRET" | "SESSION_SECRET") {
 }
 
 export type PayloadAcceso = {
-  /** id del Alumno al que pertenece el token */
+  /** id del Profesional al que pertenece el token */
   sub: string;
   /** id de la fila TokenAcceso — permite invalidarlo tras su primer uso */
   jti: string;
@@ -56,23 +56,23 @@ export const firmarTokenRecuperacion = (payload: PayloadAcceso) =>
 export const verificarTokenRecuperacion = (token: string) =>
   verificarToken(token, "recuperar-contrasena");
 
-/** Cookie de sesión del alumno. Vigencia: 30 días. */
-export async function firmarSesionAlumno(alumnoId: string) {
+/** Cookie de sesión del profesional. Vigencia: 30 días. */
+export async function firmarSesionProfesional(profesionalId: string) {
   return new SignJWT({})
     .setProtectedHeader({ alg: "HS256" })
     .setIssuer(ISSUER)
-    .setAudience("alumno-session")
-    .setSubject(alumnoId)
+    .setAudience("profesional-session")
+    .setSubject(profesionalId)
     .setIssuedAt()
     .setExpirationTime("30d")
     .sign(secret("SESSION_SECRET"));
 }
 
-export async function verificarSesionAlumno(token: string): Promise<string | null> {
+export async function verificarSesionProfesional(token: string): Promise<string | null> {
   try {
     const { payload } = await jwtVerify(token, secret("SESSION_SECRET"), {
       issuer: ISSUER,
-      audience: "alumno-session",
+      audience: "profesional-session",
     });
     return typeof payload.sub === "string" ? payload.sub : null;
   } catch {

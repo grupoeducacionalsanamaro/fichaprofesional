@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { requerirAlumno } from "@/lib/auth";
+import { requerirProfesional } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { Aviso, Boton, Rotulo } from "@/components/ui";
 import { FormularioFicha } from "./formulario-ficha";
@@ -9,9 +9,9 @@ export const dynamic = "force-dynamic";
 export const metadata = { title: "Mi ficha", robots: { index: false, follow: false } };
 
 export default async function PanelFicha() {
-  const alumnoId = await requerirAlumno();
-  const alumno = await prisma.alumno.findUniqueOrThrow({
-    where: { id: alumnoId },
+  const profesionalId = await requerirProfesional();
+  const profesional = await prisma.profesional.findUniqueOrThrow({
+    where: { id: profesionalId },
     select: {
       nombreCompleto: true,
       email: true,
@@ -26,12 +26,13 @@ export default async function PanelFicha() {
       horariosAtencion: true,
       bio: true,
       redesSociales: true,
+      temaFicha: true,
       estadoPublicacion: true,
     },
   });
 
-  const publicada = alumno.estadoPublicacion === "PUBLICADA";
-  const puedePublicar = alumno.emailVerificado && alumno.nombreCompleto.trim() && alumno.tituloProfesional.trim();
+  const publicada = profesional.estadoPublicacion === "PUBLICADA";
+  const puedePublicar = profesional.emailVerificado && profesional.nombreCompleto.trim() && profesional.tituloProfesional.trim();
 
   return (
     <div className="space-y-5">
@@ -50,7 +51,7 @@ export default async function PanelFicha() {
           </form>
         </div>
 
-        {!alumno.emailVerificado && (
+        {!profesional.emailVerificado && (
           <div className="mt-4">
             <Aviso tono="info">
               Confirma tu correo para poder publicar tu ficha.{" "}
@@ -62,7 +63,7 @@ export default async function PanelFicha() {
         )}
       </section>
 
-      <FormularioFicha alumno={alumno} />
+      <FormularioFicha profesional={profesional} />
     </div>
   );
 }

@@ -1,4 +1,4 @@
-import { requerirAlumno } from "@/lib/auth";
+import { requerirProfesional } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { Aviso, Boton, Rotulo } from "@/components/ui";
 import { FormularioContrasena } from "./formulario-contrasena";
@@ -9,9 +9,9 @@ export const dynamic = "force-dynamic";
 export const metadata = { title: "Mi cuenta", robots: { index: false, follow: false } };
 
 export default async function PanelCuenta() {
-  const alumnoId = await requerirAlumno();
-  const alumno = await prisma.alumno.findUniqueOrThrow({
-    where: { id: alumnoId },
+  const profesionalId = await requerirProfesional();
+  const profesional = await prisma.profesional.findUniqueOrThrow({
+    where: { id: profesionalId },
     select: { email: true, emailVerificado: true },
   });
 
@@ -19,8 +19,8 @@ export default async function PanelCuenta() {
     <div className="space-y-5">
       <section className="rounded-tarjeta bg-superficie p-5 shadow-tarjeta ring-1 ring-tinta-200/70">
         <Rotulo>Correo de la cuenta</Rotulo>
-        <p className="mt-1 text-[15px] text-tinta-900">{alumno.email}</p>
-        {alumno.emailVerificado ? (
+        <p className="mt-1 text-[15px] text-tinta-900">{profesional.email}</p>
+        {profesional.emailVerificado ? (
           <div className="mt-3">
             <Aviso tono="exito">Correo confirmado.</Aviso>
           </div>

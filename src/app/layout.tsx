@@ -19,11 +19,11 @@ const archivoNarrow = Archivo_Narrow({
 
 export const metadata: Metadata = {
   title: {
-    default: "Directorio de Alumnos — Grupo San Amaro",
-    template: "%s — Directorio de Alumnos",
+    default: "Directorio de Profesionales — Grupo San Amaro",
+    template: "%s — Directorio de Profesionales",
   },
   description:
-    "Directorio profesional de alumnos y egresados del Grupo Educacional San Amaro: ficha de contacto pública para que cada uno se dé a conocer.",
+    "Directorio de profesionales y egresados del Grupo Educacional San Amaro: ficha de contacto pública para que cada uno se dé a conocer.",
 };
 
 export default function RootLayout({ children }: LayoutProps<"/">) {

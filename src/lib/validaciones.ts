@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { TEMA_FICHA_IDS } from "@/lib/temas-ficha";
 
 /**
  * Campo opcional: acepta texto de formulario ("" → null) y también null, porque
@@ -84,7 +85,7 @@ export const esquemaRedSocial = z.object({
   url: z.url("Enlace inválido."),
 });
 
-/** Datos de la ficha profesional que el propio alumno edita. */
+/** Datos de la ficha profesional que el propio profesional edita. */
 export const esquemaFicha = z.object({
   nombreCompleto: z.string().trim().min(3, "Ingresa tu nombre completo.").max(160),
   tituloProfesional: z.string().trim().min(2, "Indica tu título profesional.").max(120),
@@ -97,6 +98,7 @@ export const esquemaFicha = z.object({
   bio: textoOpcional(600),
   redesSociales: z.array(esquemaRedSocial).max(8).default([]),
   fotoUrl: textoOpcional(600),
+  temaFicha: z.enum(TEMA_FICHA_IDS).catch("PETROLEO"),
 });
 
 export type DatosFicha = z.infer<typeof esquemaFicha>;

@@ -33,10 +33,10 @@ export async function restablecerContrasena(
   const passwordHash = await hashearContrasena(analisis.data.contrasena);
 
   await prisma.$transaction([
-    prisma.alumno.update({ where: { id: fila.alumnoId }, data: { passwordHash } }),
+    prisma.profesional.update({ where: { id: fila.profesionalId }, data: { passwordHash } }),
   ]);
   await marcarTokenUsado(fila.id);
 
-  await iniciarSesion(fila.alumnoId);
+  await iniciarSesion(fila.profesionalId);
   redirect("/panel");
 }

@@ -4,7 +4,7 @@ import { redirect } from "next/navigation";
 import { revalidatePath } from "next/cache";
 import { del } from "@vercel/blob";
 import { prisma } from "@/lib/prisma";
-import { requerirAlumno, cerrarSesion } from "@/lib/auth";
+import { requerirProfesional, cerrarSesion } from "@/lib/auth";
 import { hashearContrasena, verificarContrasena } from "@/lib/password";
 import { crearEnlaceVerificacion } from "@/lib/tokens-acceso";
 import { enviarVerificacionCorreo } from "@/lib/email";
@@ -12,15 +12,15 @@ import { esquemaCambiarContrasena, esquemaEliminarCuenta } from "@/lib/validacio
 import { blobConfigurado } from "@/lib/blob";
 
 export async function reenviarVerificacion() {
-  const alumnoId = await requerirAlumno();
-  const alumno = await prisma.alumno.findUniqueOrThrow({
-    where: { id: alumnoId },
+  const profesionalId = await requerirProfesional();
+  const profesional = await prisma.profesional.findUniqueOrThrow({
+    where: { id: profesionalId },
     select: { email: true, nombreCompleto: true, emailVerificado: true },
   });
-  if (alumno.emailVerificado) return;
+  if (profesional.emailVerificado) return;
 
-  const enlace = await crearEnlaceVerificacion(alumnoId);
-  await enviarVerificacionCorreo({ para: alumno.email, nombre: alumno.nombreCompleto, enlace });
+  const enlace = await crearEnlaceVerificacion(profesionalId);
+  await enviarVerificacionCorreo({ para: profesional.email, nombre: profesional.nombreCompleto, enlace });
 }
 
 export type EstadoContrasena = { error?: string; guardado?: boolean };
@@ -29,7 +29,7 @@ export async function cambiarContrasena(
   _previo: EstadoContrasena,
   formData: FormData,
 ): Promise<EstadoContrasena> {
-  const alumnoId = await requerirAlumno();
+  const profesionalId = await requerirProfesional();
 
   const analisis = esquemaCambiarContrasena.safeParse({
     contrasenaActual: formData.get("contrasenaActual") ?? "",
@@ -40,17 +40,17 @@ export async function cambiarContrasena(
     return { error: analisis.error.issues[0]?.message ?? "Revisa los datos ingresados." };
   }
 
-  const alumno = await prisma.alumno.findUniqueOrThrow({
-    where: { id: alumnoId },
+  const profesional = await prisma.profesional.findUniqueOrThrow({
+    where: { id: profesionalId },
     select: { passwordHash: true },
   });
-  const correcta = await verificarContrasena(analisis.data.contrasenaActual, alumno.passwordHash);
+  const correcta = await verificarContrasena(analisis.data.contrasenaActual, profesional.passwordHash);
   if (!correcta) {
     return { error: "Tu contraseña actual no es correcta." };
   }
 
   const passwordHash = await hashearContrasena(analisis.data.contrasena);
-  await prisma.alumno.update({ where: { id: alumnoId }, data: { passwordHash } });
+  await prisma.profesional.update({ where: { id: profesionalId }, data: { passwordHash } });
 
   return { guardado: true };
 }
@@ -61,7 +61,7 @@ export async function eliminarCuenta(
   _previo: EstadoEliminar,
   formData: FormData,
 ): Promise<EstadoEliminar> {
-  const alumnoId = await requerirAlumno();
+  const profesionalId = await requerirProfesional();
 
   const analisis = esquemaEliminarCuenta.safeParse({
     confirmacion: formData.get("confirmacion") ?? "",
@@ -70,17 +70,17 @@ export async function eliminarCuenta(
     return { error: analisis.error.issues[0]?.message ?? "Escribe ELIMINAR para confirmar." };
   }
 
-  const alumno = await prisma.alumno.findUniqueOrThrow({
-    where: { id: alumnoId },
+  const profesional = await prisma.profesional.findUniqueOrThrow({
+    where: { id: profesionalId },
     select: { fotoUrl: true },
   });
 
-  await prisma.alumno.delete({ where: { id: alumnoId } });
+  await prisma.profesional.delete({ where: { id: profesionalId } });
 
-  if (alumno.fotoUrl && blobConfigurado()) {
+  if (profesional.fotoUrl && blobConfigurado()) {
     // La cuenta ya se borró; que falle el borrado de la foto no debe impedir
     // salir de la sesión de una cuenta que ya no existe.
-    await del(alumno.fotoUrl).catch(() => {});
+    await del(profesional.fotoUrl).catch(() => {});
   }
 
   await cerrarSesion();

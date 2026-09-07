@@ -32,12 +32,12 @@ async function hashearContrasena(contrasena: string): Promise<string> {
 // --- Fichas de DEMOSTRACIÓN ---
 // Datos completamente ficticios. No corresponden a ninguna persona real.
 // Sirven para revisar el flujo visual (publicada / borrador) sin usar datos
-// de un alumno real. Bórralas antes de producción:
-//   DELETE FROM "Alumno" WHERE "email" LIKE '%@demo.sanamaro.cl';
+// de un profesional real. Bórralas antes de producción:
+//   DELETE FROM "Profesional" WHERE "email" LIKE '%@demo.sanamaro.cl';
 async function main() {
   const passwordHash = await hashearContrasena("demo-solo-para-pruebas");
 
-  await prisma.alumno.upsert({
+  await prisma.profesional.upsert({
     where: { email: "demo.publicada@demo.sanamaro.cl" },
     update: {},
     create: {
@@ -60,7 +60,7 @@ async function main() {
     },
   });
 
-  await prisma.alumno.upsert({
+  await prisma.profesional.upsert({
     where: { email: "demo.borrador@demo.sanamaro.cl" },
     update: {},
     create: {

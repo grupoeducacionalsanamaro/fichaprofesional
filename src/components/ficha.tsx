@@ -2,7 +2,10 @@ import { ExternalLink, Mail, MessageCircle } from "lucide-react";
 import { Avatar } from "@/components/avatar";
 import { Rotulo } from "@/components/ui";
 import type { FichaPublica, RedSocial } from "@/lib/datos-publicos";
+import { obtenerTemaFicha, type TEMAS_FICHA } from "@/lib/temas-ficha";
 import { cn, telefonoAWhatsapp } from "@/lib/utils";
+
+type Tema = (typeof TEMAS_FICHA)[number];
 
 function redesSociales(valor: FichaPublica["redesSociales"]): RedSocial[] {
   if (!Array.isArray(valor)) return [];
@@ -12,23 +15,26 @@ function redesSociales(valor: FichaPublica["redesSociales"]): RedSocial[] {
   );
 }
 
-/** Cabecera de la ficha: foto, nombre y título profesional sobre fondo petróleo. */
-function Encabezado({ ficha }: { ficha: FichaPublica }) {
+/** Cabecera de la ficha: foto, nombre y título profesional sobre el color elegido por el profesional. */
+function Encabezado({ ficha, tema }: { ficha: FichaPublica; tema: Tema }) {
   return (
-    <div className="flex items-center gap-4 border-b-2 border-laton-500 bg-petroleo-700 p-5">
+    <div
+      className="flex items-center gap-4 border-b-2 p-5"
+      style={{ backgroundColor: tema.primario, borderColor: tema.acento }}
+    >
       <Avatar nombre={ficha.nombreCompleto} fotoUrl={ficha.fotoUrl} tamano={80} />
       <div className="min-w-0">
         <h2 className="truncate text-[1.4rem] font-bold leading-tight tracking-tight text-white">
           {ficha.nombreCompleto}
         </h2>
-        <p className="mt-0.5 truncate text-[15px] text-laton-200">{ficha.tituloProfesional}</p>
+        <p className="mt-0.5 truncate text-[15px] text-white/75">{ficha.tituloProfesional}</p>
       </div>
     </div>
   );
 }
 
 /** Acciones de contacto — lo primero accionable al abrir la ficha. */
-export function AccionesContacto({ ficha }: { ficha: FichaPublica }) {
+export function AccionesContacto({ ficha, tema }: { ficha: FichaPublica; tema: Tema }) {
   const acciones = [
     ficha.whatsapp && {
       href: `https://wa.me/${telefonoAWhatsapp(ficha.whatsapp)}`,
@@ -50,7 +56,8 @@ export function AccionesContacto({ ficha }: { ficha: FichaPublica }) {
         <a
           key={texto}
           href={href}
-          className="movimiento-hover group/accion flex min-h-18 flex-col items-center justify-center gap-1.5 rounded-control bg-petroleo-600 px-2 text-sm font-semibold text-white shadow-boton transition-[transform,background-color,box-shadow] duration-150 hover:-translate-y-0.5 hover:bg-petroleo-500 hover:shadow-elevada active:translate-y-px active:scale-[0.985]"
+          style={{ backgroundColor: tema.boton }}
+          className="movimiento-hover group/accion flex min-h-18 flex-col items-center justify-center gap-1.5 rounded-control px-2 text-sm font-semibold text-white shadow-boton transition-[transform,filter,box-shadow] duration-150 hover:-translate-y-0.5 hover:brightness-110 hover:shadow-elevada active:translate-y-px active:scale-[0.985] active:brightness-95"
         >
           <Icono
             aria-hidden
@@ -64,7 +71,7 @@ export function AccionesContacto({ ficha }: { ficha: FichaPublica }) {
   );
 }
 
-function BotonesRedes({ redes }: { redes: RedSocial[] }) {
+function BotonesRedes({ redes, tema }: { redes: RedSocial[]; tema: Tema }) {
   if (redes.length === 0) return null;
   return (
     <div className="flex flex-wrap gap-2">
@@ -74,7 +81,8 @@ function BotonesRedes({ redes }: { redes: RedSocial[] }) {
           href={red.url}
           target="_blank"
           rel="noopener noreferrer"
-          className="movimiento-hover inline-flex min-h-10 items-center gap-1.5 rounded-control border border-tinta-200 bg-superficie px-3.5 text-sm font-semibold text-tinta-800 shadow-tarjeta transition-[transform,box-shadow,border-color] duration-150 hover:-translate-y-0.5 hover:border-petroleo-300 hover:shadow-elevada"
+          style={{ "--tema-borde-hover": tema.boton } as React.CSSProperties}
+          className="movimiento-hover inline-flex min-h-10 items-center gap-1.5 rounded-control border border-tinta-200 bg-superficie px-3.5 text-sm font-semibold text-tinta-800 shadow-tarjeta transition-[transform,box-shadow,border-color] duration-150 hover:-translate-y-0.5 hover:border-[var(--tema-borde-hover)] hover:shadow-elevada"
         >
           {red.plataforma}
           <ExternalLink aria-hidden size={14} className="text-tinta-400" />
@@ -99,12 +107,14 @@ function Dato({ rotulo, valor }: { rotulo: string; valor: React.ReactNode }) {
 /** Ficha individual completa. */
 export function TarjetaFicha({ ficha }: { ficha: FichaPublica }) {
   const redes = redesSociales(ficha.redesSociales);
+  const tema = obtenerTemaFicha(ficha.temaFicha);
+
   return (
     <article className="animate-surgir overflow-hidden rounded-tarjeta bg-superficie shadow-tarjeta ring-1 ring-tinta-200/70">
-      <Encabezado ficha={ficha} />
+      <Encabezado ficha={ficha} tema={tema} />
 
       <div className="p-5">
-        <AccionesContacto ficha={ficha} />
+        <AccionesContacto ficha={ficha} tema={tema} />
 
         {ficha.bio && (
           <p className="mt-5 text-[15px] leading-relaxed text-tinta-700">{ficha.bio}</p>
@@ -120,7 +130,8 @@ export function TarjetaFicha({ ficha }: { ficha: FichaPublica }) {
             valor={
               ficha.correoContacto && (
                 <a
-                  className="break-all text-petroleo-500 underline decoration-laton-300 decoration-2 underline-offset-4 transition-colors hover:text-petroleo-700"
+                  style={{ color: tema.boton, textDecorationColor: tema.acento }}
+                  className="break-all underline decoration-2 underline-offset-4 transition-opacity hover:opacity-80"
                   href={`mailto:${ficha.correoContacto}`}
                 >
                   {ficha.correoContacto}
@@ -132,13 +143,13 @@ export function TarjetaFicha({ ficha }: { ficha: FichaPublica }) {
 
         {redes.length > 0 && (
           <div className="mt-5">
-            <BotonesRedes redes={redes} />
+            <BotonesRedes redes={redes} tema={tema} />
           </div>
         )}
       </div>
 
       <p className="flex items-center justify-between gap-2 border-t border-tinta-100 bg-tinta-50 px-5 py-3">
-        <Rotulo>Alumno · Grupo San Amaro</Rotulo>
+        <Rotulo>Profesional · Grupo San Amaro</Rotulo>
         <Rotulo className="text-tinta-300">{ficha.id.slice(-6).toUpperCase()}</Rotulo>
       </p>
     </article>

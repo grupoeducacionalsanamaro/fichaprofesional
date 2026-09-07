@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { requerirAlumno } from "@/lib/auth";
+import { requerirProfesional } from "@/lib/auth";
 import { NavegacionPanel } from "./navegacion";
 import { salir } from "./acciones";
 
@@ -8,7 +8,7 @@ export const dynamic = "force-dynamic";
 export default async function LayoutPanel({ children }: LayoutProps<"/panel">) {
   // Toda página bajo este layout exige sesión; cada acción de escritura la
   // vuelve a exigir por su cuenta.
-  const alumnoId = await requerirAlumno();
+  const profesionalId = await requerirProfesional();
 
   return (
     <>
@@ -21,13 +21,13 @@ export default async function LayoutPanel({ children }: LayoutProps<"/panel">) {
                 Mi cuenta
               </span>
               <span className="block truncate text-[15px] font-bold tracking-tight text-tinta-900">
-                Panel del alumno
+                Panel del profesional
               </span>
             </span>
           </Link>
           <div className="flex items-center gap-3 text-sm">
             <Link
-              href={`/ficha/${alumnoId}`}
+              href={`/ficha/${profesionalId}`}
               className="hidden font-semibold text-petroleo-500 underline sm:inline"
             >
               Ver mi ficha pública

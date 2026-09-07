@@ -1,5 +1,5 @@
-// Esquema de datos — Directorio de Alumnos, Grupo Educacional San Amaro.
-// Ficha profesional autogestionada: cada alumno crea su cuenta, edita su
+// Esquema de datos — Directorio de Profesionales, Grupo Educacional San Amaro.
+// Ficha profesional autogestionada: cada profesional crea su cuenta, edita su
 // propia ficha y decide cuándo publicarla. No hay panel de RR.HH. ni datos
 // de institución — ver README.
 
@@ -12,12 +12,12 @@ datasource db {
   provider = "postgresql"
 }
 
-model Alumno {
-  id            String  @id @default(cuid()) // id_ficha — usado en la URL pública
-  nombreCompleto String
-  email         String  @unique // solo para iniciar sesión — nunca se muestra en la ficha pública
+model Profesional {
+  id              String  @id @default(cuid()) // id_ficha — usado en la URL pública
+  nombreCompleto  String
+  email           String  @unique // solo para iniciar sesión — nunca se muestra en la ficha pública
   emailVerificado Boolean @default(false)
-  passwordHash  String
+  passwordHash    String
 
   tituloProfesional         String  @default("")
   especializacion           String?
@@ -31,6 +31,10 @@ model Alumno {
 
   /// Botones de redes sociales de la ficha pública: [{ plataforma, url }]
   redesSociales Json?
+
+  /// Combinación de color de la ficha pública. Ver src/lib/temas-ficha.ts
+  /// para los valores reales de cada una — el enum solo fija qué opciones existen.
+  temaFicha TemaFicha @default(PETROLEO)
 
   estadoPublicacion EstadoPublicacion @default(BORRADOR)
 
@@ -46,16 +50,16 @@ model Alumno {
 /// La firma JWT no basta por sí sola: esta tabla es la que permite
 /// invalidarlo tras su primer uso o al emitir uno nuevo.
 model TokenAcceso {
-  id        String        @id @default(cuid())
-  alumnoId  String
-  alumno    Alumno        @relation(fields: [alumnoId], references: [id], onDelete: Cascade)
-  jti       String        @unique
-  proposito TokenProposito
-  expiraEn  DateTime
-  usadoEn   DateTime?
-  creadoEn  DateTime      @default(now())
+  id            String         @id @default(cuid())
+  profesionalId String
+  profesional   Profesional    @relation(fields: [profesionalId], references: [id], onDelete: Cascade)
+  jti           String         @unique
+  proposito     TokenProposito
+  expiraEn      DateTime
+  usadoEn       DateTime?
+  creadoEn      DateTime       @default(now())
 
-  @@index([alumnoId, proposito])
+  @@index([profesionalId, proposito])
 }
 
 enum TokenProposito {
@@ -66,4 +70,13 @@ enum TokenProposito {
 enum EstadoPublicacion {
   BORRADOR
   PUBLICADA
+}
+
+enum TemaFicha {
+  PETROLEO
+  BURDEOS
+  MARINO
+  BOSQUE
+  GRAFITO
+  ROSADO
 }

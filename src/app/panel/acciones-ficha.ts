@@ -4,7 +4,7 @@ import { revalidatePath } from "next/cache";
 import { put } from "@vercel/blob";
 import { blobConfigurado } from "@/lib/blob";
 import { prisma } from "@/lib/prisma";
-import { requerirAlumno } from "@/lib/auth";
+import { requerirProfesional } from "@/lib/auth";
 import { esquemaFicha, MAX_FOTO_BYTES, TIPOS_FOTO } from "@/lib/validaciones";
 import type { Prisma } from "@/generated/prisma/client";
 
@@ -27,6 +27,7 @@ const CAMPOS_TEXTO = [
   "direccionConsultorio",
   "horariosAtencion",
   "bio",
+  "temaFicha",
 ] as const;
 
 function recuperarValores(formData: FormData) {
@@ -42,11 +43,11 @@ function leerRedesSociales(formData: FormData) {
 }
 
 export async function guardarFicha(_previo: EstadoFicha, formData: FormData): Promise<EstadoFicha> {
-  const alumnoId = await requerirAlumno();
+  const profesionalId = await requerirProfesional();
   const valores = recuperarValores(formData);
 
-  const actual = await prisma.alumno.findUniqueOrThrow({
-    where: { id: alumnoId },
+  const actual = await prisma.profesional.findUniqueOrThrow({
+    where: { id: profesionalId },
     select: { fotoUrl: true },
   });
 
@@ -62,6 +63,7 @@ export async function guardarFicha(_previo: EstadoFicha, formData: FormData): Pr
     bio: formData.get("bio") ?? "",
     redesSociales: leerRedesSociales(formData),
     fotoUrl: actual.fotoUrl ?? "",
+    temaFicha: formData.get("temaFicha") ?? "PETROLEO",
   });
   if (!analisis.success) {
     return { error: analisis.error.issues[0]?.message ?? "Revisa los datos ingresados.", valores };
@@ -81,7 +83,7 @@ export async function guardarFicha(_previo: EstadoFicha, formData: FormData): Pr
       return { error: "La carga de fotos no está configurada todavía.", valores };
     }
     const extension = foto.type.split("/")[1]?.replace("jpeg", "jpg") ?? "jpg";
-    const subida = await put(`alumnos/${alumnoId}.${extension}`, foto, {
+    const subida = await put(`profesionales/${profesionalId}.${extension}`, foto, {
       access: "public",
       addRandomSuffix: true,
       contentType: foto.type,
@@ -90,8 +92,8 @@ export async function guardarFicha(_previo: EstadoFicha, formData: FormData): Pr
     fotoActualizada = true;
   }
 
-  await prisma.alumno.update({
-    where: { id: alumnoId },
+  await prisma.profesional.update({
+    where: { id: profesionalId },
     data: {
       nombreCompleto: datos.nombreCompleto,
       tituloProfesional: datos.tituloProfesional,
@@ -104,30 +106,31 @@ export async function guardarFicha(_previo: EstadoFicha, formData: FormData): Pr
       bio: datos.bio,
       redesSociales: datos.redesSociales as unknown as Prisma.InputJsonValue,
       fotoUrl: datos.fotoUrl,
+      temaFicha: datos.temaFicha,
     },
   });
 
   revalidatePath("/panel");
-  revalidatePath(`/ficha/${alumnoId}`);
+  revalidatePath(`/ficha/${profesionalId}`);
   revalidatePath("/");
   return { guardado: true, fotoActualizada };
 }
 
 export async function alternarPublicacion() {
-  const alumnoId = await requerirAlumno();
-  const alumno = await prisma.alumno.findUniqueOrThrow({
-    where: { id: alumnoId },
+  const profesionalId = await requerirProfesional();
+  const profesional = await prisma.profesional.findUniqueOrThrow({
+    where: { id: profesionalId },
     select: { estadoPublicacion: true, emailVerificado: true, nombreCompleto: true, tituloProfesional: true },
   });
 
-  if (alumno.estadoPublicacion === "PUBLICADA") {
-    await prisma.alumno.update({ where: { id: alumnoId }, data: { estadoPublicacion: "BORRADOR" } });
-  } else if (alumno.emailVerificado && alumno.nombreCompleto.trim() && alumno.tituloProfesional.trim()) {
+  if (profesional.estadoPublicacion === "PUBLICADA") {
+    await prisma.profesional.update({ where: { id: profesionalId }, data: { estadoPublicacion: "BORRADOR" } });
+  } else if (profesional.emailVerificado && profesional.nombreCompleto.trim() && profesional.tituloProfesional.trim()) {
     // Revalidado en el servidor: los controles del formulario son solo ayuda visual.
-    await prisma.alumno.update({ where: { id: alumnoId }, data: { estadoPublicacion: "PUBLICADA" } });
+    await prisma.profesional.update({ where: { id: profesionalId }, data: { estadoPublicacion: "PUBLICADA" } });
   }
 
   revalidatePath("/panel");
-  revalidatePath(`/ficha/${alumnoId}`);
+  revalidatePath(`/ficha/${profesionalId}`);
   revalidatePath("/");
 }

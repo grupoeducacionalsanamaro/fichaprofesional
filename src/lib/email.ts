@@ -1,7 +1,7 @@
 import "server-only";
 import { Resend } from "resend";
 
-const FROM = process.env.EMAIL_FROM ?? "Directorio de Alumnos San Amaro <onboarding@resend.dev>";
+const FROM = process.env.EMAIL_FROM ?? "Directorio de Profesionales San Amaro <onboarding@resend.dev>";
 const REPLY_TO = process.env.EMAIL_REPLY_TO ?? "administracion@sanamaro.cl";
 
 /** URL pública completa de la app. */
@@ -36,7 +36,7 @@ async function enviar(opciones: { to: string; subject: string; html: string; tex
 const marco = (titulo: string, cuerpo: string) => `
 <div style="font-family:system-ui,-apple-system,'Segoe UI',sans-serif;background:#f4f5f7;padding:32px 16px">
   <div style="max-width:520px;margin:0 auto;background:#fff;border-radius:16px;padding:32px">
-    <p style="margin:0 0 24px;font-size:12px;letter-spacing:.12em;text-transform:uppercase;color:#0f766e;font-weight:600">Directorio de Alumnos — Grupo San Amaro</p>
+    <p style="margin:0 0 24px;font-size:12px;letter-spacing:.12em;text-transform:uppercase;color:#0f766e;font-weight:600">Directorio de Profesionales — Grupo San Amaro</p>
     <h1 style="margin:0 0 16px;font-size:20px;color:#111827">${titulo}</h1>
     ${cuerpo}
   </div>
@@ -49,10 +49,10 @@ const boton = (href: string, texto: string) =>
 export async function enviarVerificacionCorreo(params: { para: string; nombre: string; enlace: string }) {
   const titulo = "Confirma tu correo";
   const intro =
-    "Gracias por crear tu ficha en el Directorio de Alumnos. Confirma tu correo para poder publicarla. El enlace vence en 3 días.";
+    "Gracias por crear tu ficha en el Directorio de Profesionales. Confirma tu correo para poder publicarla. El enlace vence en 3 días.";
   return enviar({
     to: params.para,
-    subject: `${titulo} — Directorio de Alumnos`,
+    subject: `${titulo} — Directorio de Profesionales`,
     text: `Hola ${params.nombre},\n\n${intro}\n\n${params.enlace}`,
     html: marco(
       titulo,
@@ -64,11 +64,11 @@ export async function enviarVerificacionCorreo(params: { para: string; nombre: s
 export async function enviarRecuperacionContrasena(params: { para: string; nombre: string; enlace: string }) {
   const titulo = "Recupera tu contraseña";
   const intro =
-    "Pediste restablecer la contraseña de tu cuenta del Directorio de Alumnos. El enlace vence en 2 horas y solo puede usarse una vez.";
+    "Pediste restablecer la contraseña de tu cuenta del Directorio de Profesionales. El enlace vence en 2 horas y solo puede usarse una vez.";
   const cierre = "Si no fuiste tú, ignora este correo: tu contraseña actual sigue funcionando.";
   return enviar({
     to: params.para,
-    subject: `${titulo} — Directorio de Alumnos`,
+    subject: `${titulo} — Directorio de Profesionales`,
     text: `Hola ${params.nombre},\n\n${intro}\n\n${params.enlace}\n\n${cierre}`,
     html: marco(
       titulo,

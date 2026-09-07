@@ -44,9 +44,9 @@ export async function registrarCuenta(
 
   const passwordHash = await hashearContrasena(datos.contrasena);
 
-  let alumnoId: string;
+  let profesionalId: string;
   try {
-    const alumno = await prisma.alumno.create({
+    const profesional = await prisma.profesional.create({
       data: {
         nombreCompleto: datos.nombreCompleto,
         email: datos.email,
@@ -54,7 +54,7 @@ export async function registrarCuenta(
       },
       select: { id: true },
     });
-    alumnoId = alumno.id;
+    profesionalId = profesional.id;
   } catch (error) {
     if (error instanceof Prisma.PrismaClientKnownRequestError && error.code === "P2002") {
       return { error: "Ya existe una cuenta con ese correo. Prueba iniciar sesión.", valores };
@@ -62,9 +62,9 @@ export async function registrarCuenta(
     throw error;
   }
 
-  const enlace = await crearEnlaceVerificacion(alumnoId);
+  const enlace = await crearEnlaceVerificacion(profesionalId);
   await enviarVerificacionCorreo({ para: datos.email, nombre: datos.nombreCompleto, enlace });
 
-  await iniciarSesion(alumnoId);
+  await iniciarSesion(profesionalId);
   redirect("/panel");
 }
