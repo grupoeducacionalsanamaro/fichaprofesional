@@ -1,0 +1,143 @@
+@import "tailwindcss";
+
+/* ============================================================================
+   Sistema visual "Credencial"
+   ----------------------------------------------------------------------------
+   El producto físico es una credencial que alguien acerca al teléfono. Todo el
+   lenguaje visual viene de ahí: una banda superior con la marca, una ranura de
+   cordón, rótulos angostos en versalitas como los de una tarjeta de
+   identificación, y un acento latón que hace de "grabado" sobre el petróleo.
+   Neutro a nivel holding: no usa la paleta de ninguna marca en particular.
+   ========================================================================== */
+@theme {
+  /* Neutros con tinte petróleo — nunca gris puro */
+  --color-tinta-50: #f4f6f6;
+  --color-tinta-100: #e8edee;
+  --color-tinta-200: #cfd9db;
+  --color-tinta-300: #adbdc0;
+  --color-tinta-400: #7f9297;
+  --color-tinta-500: #5c7075;
+  --color-tinta-600: #44585d;
+  --color-tinta-700: #304448;
+  --color-tinta-800: #1d3135;
+  --color-tinta-900: #0e2226;
+
+  /* Petróleo — color de acción */
+  --color-petroleo-50: #eef6f7;
+  --color-petroleo-100: #d6eaec;
+  --color-petroleo-400: #1a7383;
+  --color-petroleo-500: #14606d;
+  --color-petroleo-600: #104e59;
+  --color-petroleo-700: #0c3c45;
+  --color-petroleo-900: #072429;
+
+  /* Latón — acento de credencial: bandas, foco, marcas de selección */
+  --color-laton-100: #faf0df;
+  --color-laton-200: #f0dcbb;
+  --color-laton-300: #dfbe89;
+  --color-laton-500: #bd8b45;
+  --color-laton-600: #a3742f;
+  --color-laton-700: #7d5720;
+
+  --color-alerta-50: #fdf3e7;
+  --color-alerta-700: #8a5216;
+  --color-exito-50: #e9f6f0;
+  --color-exito-700: #1a6a4c;
+  --color-error-50: #fdeeec;
+  --color-error-600: #b5352a;
+  --color-error-700: #93281f;
+
+  --color-fondo: #f2f4f3;
+  --color-superficie: #ffffff;
+
+  /* Tipografía: Archivo para todo, Archivo Narrow en versalitas para los
+     rótulos de datos — es la voz de una tarjeta de identificación. */
+  --font-sans: var(--font-archivo), ui-sans-serif, system-ui, sans-serif;
+  --font-rotulo: var(--font-archivo-narrow), ui-sans-serif, system-ui, sans-serif;
+
+  --radius-tarjeta: 1.375rem;
+  --radius-control: 0.75rem;
+
+  --shadow-tarjeta: 0 1px 2px rgb(14 34 38 / 0.05), 0 8px 24px -16px rgb(14 34 38 / 0.28);
+  --shadow-elevada: 0 2px 4px rgb(14 34 38 / 0.06), 0 18px 40px -20px rgb(14 34 38 / 0.4);
+  --shadow-boton: 0 1px 0 rgb(255 255 255 / 0.12) inset, 0 2px 8px -2px rgb(12 60 69 / 0.5);
+
+  --animate-surgir: surgir 0.36s cubic-bezier(0.16, 1, 0.3, 1) both;
+  --animate-desplegar: desplegar 0.14s cubic-bezier(0.16, 1, 0.3, 1) both;
+  --animate-girar: girar 0.7s linear infinite;
+
+  @keyframes surgir {
+    from {
+      opacity: 0;
+      transform: translateY(10px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  @keyframes desplegar {
+    from {
+      opacity: 0;
+      transform: translateY(-4px) scale(0.98);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0) scale(1);
+    }
+  }
+
+  @keyframes girar {
+    to {
+      transform: rotate(360deg);
+    }
+  }
+}
+
+html {
+  color-scheme: light;
+}
+
+body {
+  background-color: var(--color-fondo);
+  /* Textura mínima: la luz cae desde arriba, como sobre una tarjeta apoyada. */
+  background-image: radial-gradient(120% 60% at 50% -10%, #ffffff 0%, transparent 60%);
+  color: var(--color-tinta-900);
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+/* Foco latón: visible sobre el blanco de los formularios y sobre el petróleo
+   de los botones, sin repetir el color de acción. */
+:focus-visible {
+  outline: 2px solid var(--color-laton-500);
+  outline-offset: 2px;
+  border-radius: 6px;
+}
+
+::selection {
+  background: var(--color-laton-200);
+  color: var(--color-tinta-900);
+}
+
+/* La barra de desplazamiento del panel desplegable, discreta */
+.desplazable-fino {
+  scrollbar-width: thin;
+  scrollbar-color: var(--color-tinta-300) transparent;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+  /* Sin desplazamientos: el hover cambia color, no posición. */
+  .movimiento-hover {
+    transform: none !important;
+  }
+}

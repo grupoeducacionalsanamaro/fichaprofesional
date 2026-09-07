@@ -1,0 +1,67 @@
+// Esquema de datos — Directorio de Alumnos, Grupo Educacional San Amaro.
+// Ficha profesional autogestionada: cada alumno crea su cuenta, edita su
+// propia ficha y decide cuándo publicarla. No hay panel de RR.HH. ni datos
+// de institución — ver README.
+
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model Alumno {
+  id            String  @id @default(cuid()) // id_ficha — usado en la URL pública
+  nombreCompleto String
+  email         String  @unique // login y botón de contacto público
+  emailVerificado Boolean @default(false)
+  passwordHash  String
+
+  tituloProfesional         String  @default("")
+  numeroRegistroProfesional String?
+  fotoUrl                   String?
+  whatsapp                  String?
+  direccionConsultorio      String?
+  horariosAtencion          String?
+  bio                       String?
+
+  /// Botones de redes sociales de la ficha pública: [{ plataforma, url }]
+  redesSociales Json?
+
+  estadoPublicacion EstadoPublicacion @default(BORRADOR)
+
+  tokens TokenAcceso[]
+
+  creadoEn      DateTime @default(now())
+  actualizadoEn DateTime @updatedAt
+
+  @@index([estadoPublicacion])
+}
+
+/// Token de un solo uso para verificar correo o recuperar contraseña.
+/// La firma JWT no basta por sí sola: esta tabla es la que permite
+/// invalidarlo tras su primer uso o al emitir uno nuevo.
+model TokenAcceso {
+  id        String        @id @default(cuid())
+  alumnoId  String
+  alumno    Alumno        @relation(fields: [alumnoId], references: [id], onDelete: Cascade)
+  jti       String        @unique
+  proposito TokenProposito
+  expiraEn  DateTime
+  usadoEn   DateTime?
+  creadoEn  DateTime      @default(now())
+
+  @@index([alumnoId, proposito])
+}
+
+enum TokenProposito {
+  VERIFICAR_CORREO
+  RECUPERAR_CONTRASENA
+}
+
+enum EstadoPublicacion {
+  BORRADOR
+  PUBLICADA
+}
