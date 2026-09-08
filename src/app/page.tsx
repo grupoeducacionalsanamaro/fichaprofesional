@@ -29,7 +29,7 @@ export default async function Inicio() {
             Tu ficha profesional, lista para compartir
           </h1>
           <p className="mt-2 text-[15px] leading-relaxed text-tinta-600">
-            Crea tu cuenta, arma tu ficha de contacto profesional y compártela con un solo enlace.
+            Arma tu ficha de contacto profesional y compártela con un solo enlace.
             Tú decides qué muestra y cuándo publicarla.
           </p>
 
@@ -41,20 +41,19 @@ export default async function Inicio() {
                 </Boton>
               </Link>
             ) : (
-              <>
-                <Link href="/registro">
-                  <Boton tamano="grande" className="w-full sm:w-auto sm:px-8">
-                    Crear mi ficha
-                  </Boton>
-                </Link>
-                <Link href="/login">
-                  <Boton variante="secundario" tamano="grande" className="w-full sm:w-auto sm:px-8">
-                    Iniciar sesión
-                  </Boton>
-                </Link>
-              </>
+              <Link href="/login">
+                <Boton tamano="grande" className="w-full sm:w-auto sm:px-8">
+                  Iniciar sesión
+                </Boton>
+              </Link>
             )}
           </div>
+
+          {!sesion && (
+            <p className="mt-4 text-sm text-tinta-500">
+              ¿Tienes un llavero NFC del Grupo San Amaro? Tócalo con tu celular para activar tu cuenta.
+            </p>
+          )}
         </div>
       </Contenido>
       <PieDePagina />

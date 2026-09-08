@@ -5,7 +5,7 @@ import { headers } from "next/headers";
 import { Prisma } from "@/generated/prisma/client";
 import { prisma } from "@/lib/prisma";
 import { iniciarSesion } from "@/lib/auth";
-import { reclamarChip } from "@/lib/chip-nfc";
+import { normalizarCodigoChip } from "@/lib/chip-nfc";
 import { hashearContrasena } from "@/lib/password";
 import { permitir } from "@/lib/rate-limit";
 import { crearEnlaceVerificacion } from "@/lib/tokens-acceso";
@@ -43,29 +43,46 @@ export async function registrarCuenta(
     return { error: "Demasiados intentos. Espera unos minutos e inténtalo de nuevo.", valores };
   }
 
+  // El registro es solo por invitación (llavero NFC): sin un código válido y
+  // sin reclamar, no se crea la cuenta bajo ninguna circunstancia, aunque se
+  // llame a esta acción directamente saltándose la pantalla de /registro.
+  const codigoChip = normalizarCodigoChip(String(formData.get("chip") ?? ""));
+  if (!codigoChip) {
+    return { error: "El registro es solo por invitación. Necesitas el código de tu llavero NFC.", valores };
+  }
+
   const passwordHash = await hashearContrasena(datos.contrasena);
 
   let profesionalId: string;
   try {
-    const profesional = await prisma.profesional.create({
-      data: {
-        nombreCompleto: datos.nombreCompleto,
-        email: datos.email,
-        passwordHash,
-      },
-      select: { id: true },
+    profesionalId = await prisma.$transaction(async (tx) => {
+      const profesional = await tx.profesional.create({
+        data: {
+          nombreCompleto: datos.nombreCompleto,
+          email: datos.email,
+          passwordHash,
+        },
+        select: { id: true },
+      });
+
+      const reclamo = await tx.chipNfc.updateMany({
+        where: { codigo: codigoChip, profesionalId: null },
+        data: { profesionalId: profesional.id, reclamadoEn: new Date() },
+      });
+      if (reclamo.count === 0) {
+        throw new Error("CODIGO_CHIP_INVALIDO");
+      }
+
+      return profesional.id;
     });
-    profesionalId = profesional.id;
   } catch (error) {
     if (error instanceof Prisma.PrismaClientKnownRequestError && error.code === "P2002") {
       return { error: "Ya existe una cuenta con ese correo. Prueba iniciar sesión.", valores };
     }
+    if (error instanceof Error && error.message === "CODIGO_CHIP_INVALIDO") {
+      return { error: "Ese código de llavero no es válido o ya fue utilizado.", valores };
+    }
     throw error;
-  }
-
-  const chipCodigo = String(formData.get("chip") ?? "").trim();
-  if (chipCodigo) {
-    await reclamarChip(chipCodigo, profesionalId).catch(() => {});
   }
 
   const enlace = await crearEnlaceVerificacion(profesionalId);

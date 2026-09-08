@@ -6,7 +6,7 @@ import { Eye, EyeOff } from "lucide-react";
 import { Aviso, Boton, Campo, Entrada } from "@/components/ui";
 import { registrarCuenta, type EstadoRegistro } from "./acciones";
 
-export function FormularioRegistro({ chipCodigo }: { chipCodigo?: string | null }) {
+export function FormularioRegistro({ chipCodigo }: { chipCodigo: string }) {
   const [estado, accion, enviando] = useActionState<EstadoRegistro, FormData>(registrarCuenta, {});
   const [verContrasena, setVerContrasena] = useState(false);
 
@@ -15,14 +15,10 @@ export function FormularioRegistro({ chipCodigo }: { chipCodigo?: string | null 
       action={accion}
       className="space-y-4 rounded-tarjeta bg-superficie p-5 shadow-tarjeta ring-1 ring-tinta-200/70"
     >
-      {chipCodigo && (
-        <>
-          <input type="hidden" name="chip" value={chipCodigo} />
-          <Aviso tono="info">
-            Detectamos tu llavero NFC — se vinculará automáticamente a esta cuenta al crearla.
-          </Aviso>
-        </>
-      )}
+      <input type="hidden" name="chip" value={chipCodigo} />
+      <Aviso tono="info">
+        Detectamos tu llavero NFC — se vinculará automáticamente a esta cuenta al crearla.
+      </Aviso>
 
       <Campo etiqueta="Nombre completo" requerido>
         <Entrada

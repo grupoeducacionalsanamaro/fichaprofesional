@@ -57,12 +57,9 @@ export function FormularioAcceso({ errorSesion }: { errorSesion: boolean }) {
         {entrando ? "Entrando…" : "Iniciar sesión"}
       </Boton>
 
-      <div className="flex items-center justify-between text-sm">
+      <div className="text-center text-sm">
         <Link href="/recuperar" className="font-semibold text-petroleo-500 underline">
           Olvidé mi contraseña
-        </Link>
-        <Link href="/registro" className="font-semibold text-petroleo-500 underline">
-          Crear cuenta
         </Link>
       </div>
     </form>
