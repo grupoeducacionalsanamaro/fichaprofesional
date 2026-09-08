@@ -15,6 +15,11 @@ import { permitir } from "@/lib/rate-limit";
 
 export async function reenviarVerificacion() {
   const profesionalId = await requerirProfesional();
+
+  if (!permitir(`reenviar-verificacion:${profesionalId}`, 5, 10 * 60_000)) {
+    return;
+  }
+
   const profesional = await prisma.profesional.findUniqueOrThrow({
     where: { id: profesionalId },
     select: { email: true, nombreCompleto: true, emailVerificado: true },
@@ -110,5 +115,6 @@ export async function eliminarCuenta(
 
   await cerrarSesion();
   revalidatePath("/");
+  revalidatePath(`/ficha/${profesionalId}`);
   redirect("/");
 }

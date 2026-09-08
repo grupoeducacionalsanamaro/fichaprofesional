@@ -79,10 +79,25 @@ export const esquemaCambiarContrasena = z
     path: ["confirmarContrasena"],
   });
 
-/** Un enlace por red social: etiqueta libre + URL. */
+/**
+ * Un enlace por red social: etiqueta libre + URL. `z.url()` por sí solo acepta
+ * cualquier esquema sintácticamente válido —incluido `javascript:` o
+ * `data:`—, y este enlace se renderiza como `<a href>` en la ficha pública
+ * que cualquiera puede compartir. Se restringe explícitamente a http/https.
+ */
 export const esquemaRedSocial = z.object({
   plataforma: z.string().trim().min(1).max(40),
-  url: z.url("Enlace inválido."),
+  url: z
+    .string()
+    .trim()
+    .max(2048)
+    .refine((valor) => {
+      try {
+        return ["http:", "https:"].includes(new URL(valor).protocol);
+      } catch {
+        return false;
+      }
+    }, "Enlace inválido. Debe empezar con http:// o https://"),
 });
 
 /** Datos de la ficha profesional que el propio profesional edita. */

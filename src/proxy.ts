@@ -3,7 +3,11 @@ import type { NextRequest } from "next/server";
 import { permitir } from "@/lib/rate-limit";
 
 /**
- * Rate limit por IP sobre las rutas públicas (directorio y fichas).
+ * Rate limit por IP sobre las rutas públicas (landing, fichas y resolución de
+ * chips NFC). Sin este límite, /c/[codigo] queda abierto a fuerza bruta sin
+ * autenticación para descubrir códigos de llaveros aún no reclamados —
+ * la combinatoria del código (ver LARGO_CODIGO_CHIP) ya lo hace impracticable,
+ * pero no cuesta nada cerrar también el ritmo de intentos.
  * Ver limitaciones en src/lib/rate-limit.ts.
  */
 const LIMITE = 120; // peticiones
@@ -26,5 +30,5 @@ export function proxy(request: NextRequest) {
 }
 
 export const config = {
-  matcher: ["/", "/ficha/:path*"],
+  matcher: ["/", "/ficha/:path*", "/c/:path*"],
 };

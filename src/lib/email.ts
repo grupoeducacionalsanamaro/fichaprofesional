@@ -33,6 +33,16 @@ async function enviar(opciones: { to: string; subject: string; html: string; tex
   return { simulado: false as const };
 }
 
+/** El nombre del profesional viaja sin escapar hasta acá; nunca insertarlo en HTML sin pasar por esto. */
+function escaparHtml(texto: string): string {
+  return texto
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#39;");
+}
+
 const marco = (titulo: string, cuerpo: string) => `
 <div style="font-family:system-ui,-apple-system,'Segoe UI',sans-serif;background:#f4f5f7;padding:32px 16px">
   <div style="max-width:520px;margin:0 auto;background:#fff;border-radius:16px;padding:32px">
@@ -56,7 +66,7 @@ export async function enviarVerificacionCorreo(params: { para: string; nombre: s
     text: `Hola ${params.nombre},\n\n${intro}\n\n${params.enlace}`,
     html: marco(
       titulo,
-      `<p style="margin:0;color:#374151;line-height:1.6">Hola ${params.nombre}, ${intro}</p>${boton(params.enlace, "Confirmar mi correo")}`,
+      `<p style="margin:0;color:#374151;line-height:1.6">Hola ${escaparHtml(params.nombre)}, ${intro}</p>${boton(params.enlace, "Confirmar mi correo")}`,
     ),
   });
 }
@@ -72,7 +82,7 @@ export async function enviarRecuperacionContrasena(params: { para: string; nombr
     text: `Hola ${params.nombre},\n\n${intro}\n\n${params.enlace}\n\n${cierre}`,
     html: marco(
       titulo,
-      `<p style="margin:0;color:#374151;line-height:1.6">Hola ${params.nombre}, ${intro}</p>${boton(params.enlace, "Elegir nueva contraseña")}<p style="margin:24px 0 0;font-size:13px;color:#6b7280;line-height:1.6">${cierre}</p>`,
+      `<p style="margin:0;color:#374151;line-height:1.6">Hola ${escaparHtml(params.nombre)}, ${intro}</p>${boton(params.enlace, "Elegir nueva contraseña")}<p style="margin:24px 0 0;font-size:13px;color:#6b7280;line-height:1.6">${cierre}</p>`,
     ),
   });
 }
