@@ -5,6 +5,8 @@ import type { MetadataRoute } from "next";
 // permite indexación, salvo el panel de administración de cada cuenta.
 export default function robots(): MetadataRoute.Robots {
   return {
-    rules: [{ userAgent: "*", allow: "/", disallow: ["/panel", "/login", "/registro", "/recuperar", "/verificar"] }],
+    rules: [
+      { userAgent: "*", allow: "/", disallow: ["/panel", "/login", "/registro", "/recuperar", "/verificar", "/c"] },
+    ],
   };
 }

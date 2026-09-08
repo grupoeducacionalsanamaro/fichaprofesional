@@ -1,19 +1,24 @@
 import { requerirProfesional } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
+import { normalizarCodigoChip } from "@/lib/chip-nfc";
 import { Aviso, Boton, Rotulo } from "@/components/ui";
 import { FormularioContrasena } from "./formulario-contrasena";
+import { FormularioChip } from "./formulario-chip";
 import { ZonaEliminar } from "./zona-eliminar";
 import { reenviarVerificacion } from "./acciones";
 
 export const dynamic = "force-dynamic";
 export const metadata = { title: "Mi cuenta", robots: { index: false, follow: false } };
 
-export default async function PanelCuenta() {
+export default async function PanelCuenta({ searchParams }: PageProps<"/panel/cuenta">) {
   const profesionalId = await requerirProfesional();
   const profesional = await prisma.profesional.findUniqueOrThrow({
     where: { id: profesionalId },
-    select: { email: true, emailVerificado: true },
+    select: { email: true, emailVerificado: true, chipNfc: { select: { codigo: true } } },
   });
+
+  const { chip } = await searchParams;
+  const codigoPrecargado = typeof chip === "string" ? normalizarCodigoChip(chip) : null;
 
   return (
     <div className="space-y-5">
@@ -35,6 +40,23 @@ export default async function PanelCuenta() {
           </div>
         )}
       </section>
+
+      <section className="rounded-tarjeta bg-superficie p-5 shadow-tarjeta ring-1 ring-tinta-200/70">
+        <Rotulo>Llavero NFC</Rotulo>
+        {profesional.chipNfc ? (
+          <div className="mt-3">
+            <Aviso tono="exito">
+              Tu llavero está vinculado y activo (código {profesional.chipNfc.codigo}).
+            </Aviso>
+          </div>
+        ) : (
+          <p className="mt-1 text-sm text-tinta-500">
+            Aún no tienes un llavero vinculado a esta cuenta.
+          </p>
+        )}
+      </section>
+
+      {!profesional.chipNfc && <FormularioChip codigoInicial={codigoPrecargado} />}
 
       <FormularioContrasena />
       <ZonaEliminar />

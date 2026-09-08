@@ -10,6 +10,8 @@ import { crearEnlaceVerificacion } from "@/lib/tokens-acceso";
 import { enviarVerificacionCorreo } from "@/lib/email";
 import { esquemaCambiarContrasena, esquemaEliminarCuenta } from "@/lib/validaciones";
 import { blobConfigurado } from "@/lib/blob";
+import { reclamarChip } from "@/lib/chip-nfc";
+import { permitir } from "@/lib/rate-limit";
 
 export async function reenviarVerificacion() {
   const profesionalId = await requerirProfesional();
@@ -52,6 +54,29 @@ export async function cambiarContrasena(
   const passwordHash = await hashearContrasena(analisis.data.contrasena);
   await prisma.profesional.update({ where: { id: profesionalId }, data: { passwordHash } });
 
+  return { guardado: true };
+}
+
+export type EstadoChip = { error?: string; guardado?: boolean };
+
+export async function vincularChip(_previo: EstadoChip, formData: FormData): Promise<EstadoChip> {
+  const profesionalId = await requerirProfesional();
+
+  if (!permitir(`vincular-chip:${profesionalId}`, 10, 10 * 60_000)) {
+    return { error: "Demasiados intentos. Espera unos minutos e inténtalo de nuevo." };
+  }
+
+  const codigo = String(formData.get("codigo") ?? "");
+  if (!codigo.trim()) {
+    return { error: "Ingresa el código de tu llavero." };
+  }
+
+  const exito = await reclamarChip(codigo, profesionalId);
+  if (!exito) {
+    return { error: "Ese código no es válido o ya fue vinculado a otra cuenta." };
+  }
+
+  revalidatePath("/panel/cuenta");
   return { guardado: true };
 }
 

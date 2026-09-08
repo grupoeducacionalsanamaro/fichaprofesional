@@ -38,12 +38,28 @@ model Profesional {
 
   estadoPublicacion EstadoPublicacion @default(BORRADOR)
 
-  tokens TokenAcceso[]
+  tokens  TokenAcceso[]
+  chipNfc ChipNfc?
 
   creadoEn      DateTime @default(now())
   actualizadoEn DateTime @updatedAt
 
   @@index([estadoPublicacion])
+}
+
+/// Llavero físico NFC entregado en el kit de bienvenida. Se generan en lote,
+/// sin dueño (profesionalId null), antes de saber quién los va a usar. Un
+/// profesional los reclama una sola vez —al registrarse o desde su panel—
+/// y desde ahí el código queda fijo a esa cuenta para siempre: el chip
+/// físico nunca se vuelve a reprogramar. Ver /c/[codigo].
+model ChipNfc {
+  id            String       @id @default(cuid())
+  codigo        String       @unique
+  profesionalId String?      @unique
+  profesional   Profesional? @relation(fields: [profesionalId], references: [id], onDelete: SetNull)
+
+  creadoEn    DateTime  @default(now())
+  reclamadoEn DateTime?
 }
 
 /// Token de un solo uso para verificar correo o recuperar contraseña.

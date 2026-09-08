@@ -5,6 +5,7 @@ import { headers } from "next/headers";
 import { Prisma } from "@/generated/prisma/client";
 import { prisma } from "@/lib/prisma";
 import { iniciarSesion } from "@/lib/auth";
+import { reclamarChip } from "@/lib/chip-nfc";
 import { hashearContrasena } from "@/lib/password";
 import { permitir } from "@/lib/rate-limit";
 import { crearEnlaceVerificacion } from "@/lib/tokens-acceso";
@@ -60,6 +61,11 @@ export async function registrarCuenta(
       return { error: "Ya existe una cuenta con ese correo. Prueba iniciar sesión.", valores };
     }
     throw error;
+  }
+
+  const chipCodigo = String(formData.get("chip") ?? "").trim();
+  if (chipCodigo) {
+    await reclamarChip(chipCodigo, profesionalId).catch(() => {});
   }
 
   const enlace = await crearEnlaceVerificacion(profesionalId);
