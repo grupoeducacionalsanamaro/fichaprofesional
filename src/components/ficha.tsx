@@ -1,4 +1,5 @@
 import { ExternalLink, Mail, MessageCircle } from "lucide-react";
+import Image from "next/image";
 import { Avatar } from "@/components/avatar";
 import { Rotulo } from "@/components/ui";
 import type { FichaPublica, RedSocial } from "@/lib/datos-publicos";
@@ -17,6 +18,33 @@ function redesSociales(valor: FichaPublica["redesSociales"]): RedSocial[] {
 
 /** Cabecera de la ficha: foto, nombre y título profesional sobre el color elegido por el profesional. */
 function Encabezado({ ficha, tema }: { ficha: FichaPublica; tema: Tema }) {
+  if (ficha.fotoUrl) {
+    return (
+      <div className="group/portada relative h-56 overflow-hidden border-b-2" style={{ borderColor: tema.acento }}>
+        <Image
+          src={ficha.fotoUrl}
+          alt={`Fotografía de ${ficha.nombreCompleto}`}
+          fill
+          sizes="(max-width: 640px) 100vw, 512px"
+          className="object-cover transition-transform duration-500 ease-out group-hover/portada:scale-105"
+        />
+        <div
+          aria-hidden
+          className="absolute inset-0"
+          style={{
+            backgroundImage: `linear-gradient(to top, ${tema.primario} 0%, ${tema.primario}cc 40%, transparent 75%)`,
+          }}
+        />
+        <div className="absolute inset-x-0 bottom-0 p-5">
+          <h2 className="truncate text-[1.5rem] font-bold leading-tight tracking-tight text-white">
+            {ficha.nombreCompleto}
+          </h2>
+          <p className="mt-0.5 truncate text-[15px] text-white/80">{ficha.tituloProfesional}</p>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div
       className="flex items-center gap-4 border-b-2 p-5"
@@ -148,8 +176,11 @@ export function TarjetaFicha({ ficha }: { ficha: FichaPublica }) {
         )}
       </div>
 
-      <p className="flex items-center justify-between gap-2 border-t border-tinta-100 bg-tinta-50 px-5 py-3">
+      <p className="flex items-center justify-center gap-2 border-t border-tinta-100 bg-tinta-50 px-5 py-3">
         <Rotulo>Profesional · Grupo San Amaro</Rotulo>
+        <Rotulo className="text-tinta-300" aria-hidden>
+          ·
+        </Rotulo>
         <Rotulo className="text-tinta-300">{ficha.id.slice(-6).toUpperCase()}</Rotulo>
       </p>
     </article>
