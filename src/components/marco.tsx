@@ -57,7 +57,7 @@ export function Contenido({
 export function PieDePagina() {
   return (
     <footer className="mx-auto w-full max-w-3xl px-4 pb-10 pt-4">
-      <p className="border-t border-tinta-200 pt-4 text-xs leading-relaxed text-tinta-500">
+      <p className="border-t border-tinta-200 pt-4 text-center text-xs leading-relaxed text-tinta-500">
         Cada ficha es publicada y editada por su propio titular. Creado por{" "}
         <a
           href="https://sanamaro.cl"
