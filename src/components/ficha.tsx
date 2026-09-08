@@ -154,7 +154,7 @@ export function TarjetaFicha({ ficha }: { ficha: FichaPublica }) {
           <Dato rotulo="Consultorio" valor={ficha.direccionConsultorio} />
           <Dato rotulo="Horarios" valor={ficha.horariosAtencion} />
           <Dato
-            rotulo="Correo electrónico"
+            rotulo="E-Mail"
             valor={
               ficha.correoContacto && (
                 <a
