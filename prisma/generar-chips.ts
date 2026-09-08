@@ -10,7 +10,11 @@ import { writeFileSync } from "node:fs";
 import { PrismaPg } from "@prisma/adapter-pg";
 import { PrismaClient } from "../src/generated/prisma/client";
 
-const BASE_URL = process.env.APP_URL ?? "https://profesionales.sanamaro.cl";
+// Fijo a propósito, sin caer a process.env.APP_URL: este script siempre se
+// corre contra producción, y .env local trae su propio APP_URL de desarrollo
+// que "dotenv/config" no sobreescribe — usarlo por error generó un lote
+// entero de URLs con localhost la primera vez.
+const BASE_URL = "https://profesionales.sanamaro.cl";
 
 // Duplicado a propósito: src/lib/chip-nfc.ts importa "server-only", que no
 // resuelve fuera del bundler de Next (mismo motivo por el que seed.ts duplica
