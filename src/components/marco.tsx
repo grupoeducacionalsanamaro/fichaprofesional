@@ -1,8 +1,10 @@
 import Image from "next/image";
 import Link from "next/link";
+import { sesionActual } from "@/lib/auth";
 import { cn } from "@/lib/utils";
 
-export function Cabecera({ enlaceVolver }: { enlaceVolver?: boolean }) {
+export async function Cabecera({ enlaceVolver }: { enlaceVolver?: boolean }) {
+  const sesion = enlaceVolver ? await sesionActual() : null;
   return (
     <header className="sticky top-0 z-40 border-b border-tinta-200/70 bg-superficie/85 backdrop-blur-md">
       <div className="mx-auto flex max-w-3xl items-center justify-between gap-3 px-4 py-3">
@@ -26,12 +28,12 @@ export function Cabecera({ enlaceVolver }: { enlaceVolver?: boolean }) {
           </span>
         </Link>
         <div className="flex shrink-0 items-center gap-3">
-          {enlaceVolver && (
+          {enlaceVolver && sesion && (
             <Link
-              href="/"
+              href="/panel"
               className="rounded-lg px-2 py-1 text-sm font-semibold text-petroleo-500 transition-colors hover:bg-petroleo-50 hover:text-petroleo-700"
             >
-              Inicio
+              Volver a mi panel
             </Link>
           )}
         </div>
